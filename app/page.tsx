@@ -176,7 +176,6 @@ export default async function HomePage() {
     {/* Desktop: Video */}
     <video
   autoPlay
-  loop
   muted
   playsInline
   poster="/uploads/images/anasayfa_background_3.jpg"
