@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     description: 'Kişiye özel %100 el işçiliği lüks gümüş takılar. 999 ayar (%99.9 saf) fine silver ile üretilen zarif ve prestijli tasarımlar.',
     type: 'website',
     locale: 'tr_TR',
-    url: 'https://silvre.com.tr',
+    url: 'https://slvr.com.tr',
     siteName: 'Silvre',
     images: [
       {
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     images: ['/uploads/images/anasayfa_background_3.jpg'],
   },
   alternates: {
-    canonical: 'https://silvre.com.tr',
+    canonical: 'https://slvr.com.tr',
   },
 }
 
@@ -103,8 +103,8 @@ export default async function HomePage() {
     '@type': 'Organization',
     name: 'Silvre',
     alternateName: 'Silvre Jewelry',
-    url: 'https://silvre.com.tr',
-    logo: 'https://silvre.com.tr/uploads/images/silvre-logo-black.png',
+    url: 'https://slvr.com.tr',
+    logo: 'https://slvr.com.tr/uploads/images/silvre-logo-black.png',
     description: 'Lüks gümüş mücevher ve el yapımı 999 ayar saf gümüş takı koleksiyonu. %99.9 saflıkta fine silver.',
     address: {
       '@type': 'PostalAddress',
@@ -123,10 +123,10 @@ export default async function HomePage() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Silvre',
-    url: 'https://silvre.com.tr',
+    url: 'https://slvr.com.tr',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://silvre.com.tr/products?search={search_term_string}',
+      target: 'https://slvr.com.tr/products?search={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   }
@@ -141,7 +141,7 @@ export default async function HomePage() {
       item: {
         '@type': 'Product',
         name: product.name,
-        url: `https://silvre.com.tr/products/${product.slug}`,
+        url: `https://slvr.com.tr/products/${product.slug}`,
         image: product.images[0]?.imageUrl,
         material: '999 Ayar Saf Gümüş',
         offers: {
@@ -215,7 +215,7 @@ export default async function HomePage() {
       </h1>
       
       <div 
-        className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" 
+        className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" 
         aria-hidden="true"
       >
         Zarif & Lüks
