@@ -104,7 +104,7 @@ export default async function HomePage() {
     name: 'Silvre',
     alternateName: 'Silvre Jewelry',
     url: 'https://slvr.com.tr',
-    logo: 'https://slvr.com.tr/uploads/images/silvre-logo-black.png',
+    logo: 'https://slvr.com.tr/uploads/images/silvre.jewelry-logo-black.png',
     description: 'Lüks gümüş mücevher ve el yapımı 999 ayar saf gümüş takı koleksiyonu. %99.9 saflıkta fine silver.',
     address: {
       '@type': 'PostalAddress',
@@ -112,9 +112,9 @@ export default async function HomePage() {
       addressLocality: 'İstanbul',
     },
     sameAs: [
-      'https://instagram.com/silvre',
-      'https://facebook.com/silvre',
-      'https://twitter.com/silvre',
+      'https://instagram.com/silvre.jewelry',
+      'https://facebook.com/silvre.jewelry',
+      'https://twitter.com/silvre.jewelry',
     ],
   }
 
@@ -223,13 +223,8 @@ export default async function HomePage() {
       
       <div className="space-y-3 mb-10">
         <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
-          %99.9 saflıkta gümüşle gelen şıklığın en yeni yorumu.
-        </p>
-        <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
-          Kişiye özel %100 el işçiliği 999 ayar saf gümüş takılar.
-        </p>
-        <p className="text-sm sm:text-base text-white/80 font-light italic mt-4">
-          ✨ Sterling gümüşten daha saf, daha değerli
+          Gümüşle gelen şıklığın en yeni yorumu.
+          <br/>Kişiye özel %100 el işçiliği gümüş takılar.
         </p>
       </div>
 
