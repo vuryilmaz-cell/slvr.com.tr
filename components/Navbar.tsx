@@ -63,7 +63,7 @@ export default function Navbar() {
               )
         }`}
       >
-        <nav className="container mx-auto px-4 sm:px-6 py-4">
+        <nav className="container mx-auto px-4 sm:px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex-1 flex justify-start">
               <Link href="/" className="block hover:opacity-70 transition-opacity duration-300">

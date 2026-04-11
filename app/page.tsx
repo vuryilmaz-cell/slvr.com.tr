@@ -12,26 +12,31 @@ import TestimonialsSlider from '@/components/TestimonialsSlider'
 // Server Component - SEO için kritik
 export const revalidate = 3600 // 1 saat cache
 
-// SEO Metadata
+// SEO Metadata - 999 AYAR
 export const metadata: Metadata = {
-  title: 'Silvre - Lüks Gümüş Mücevher | 925 Ayar El Yapımı Gümüş Takılar',
-  description: 'Türkiye\'nin en prestijli lüks gümüş mücevher markası. %100 el işçiliği, kişiye özel 925 ayar gümüş takı koleksiyonu. Kolye, küpe, yüzük, bileklik modelleri.',
+  title: 'Silvre - Lüks Gümüş Mücevher | 999 Ayar Saf Gümüş El Yapımı Takılar',
+  description: 'Türkiye\'nin en prestijli lüks gümüş mücevher markası. %100 el işçiliği, kişiye özel 999 ayar saf gümüş takı koleksiyonu. %99.9 saflıkta fine silver kolye, küpe, yüzük, bileklik modelleri.',
   keywords: [
     'lüks gümüş mücevher',
     'premium gümüş takı',
-    '925 ayar gümüş',
+    '999 ayar gümüş',
+    '999 ayar saf gümüş',
+    'fine silver',
     'el yapımı gümüş takı',
     'özel tasarım gümüş',
     'butik mücevher',
     'silvre',
-    'gümüş kolye',
-    'gümüş küpe',
-    'gümüş yüzük',
-    'gümüş bileklik'
+    'saf gümüş kolye',
+    'saf gümüş küpe',
+    'saf gümüş yüzük',
+    'saf gümüş bileklik',
+    '999 ayar kolye',
+    '999 ayar küpe',
+    'sterling gümüş'
   ],
   openGraph: {
-    title: 'Silvre - Lüks Gümüş Mücevher | El Yapımı 925 Ayar Takılar',
-    description: 'Kişiye özel %100 el işçiliği lüks gümüş takılar. Zarif ve prestijli tasarımlar.',
+    title: 'Silvre - Lüks Gümüş Mücevher | El Yapımı 999 Ayar Saf Gümüş Takılar',
+    description: 'Kişiye özel %100 el işçiliği lüks gümüş takılar. 999 ayar (%99.9 saf) fine silver ile üretilen zarif ve prestijli tasarımlar.',
     type: 'website',
     locale: 'tr_TR',
     url: 'https://silvre.com.tr',
@@ -41,14 +46,14 @@ export const metadata: Metadata = {
         url: '/uploads/images/anasayfa_background_3.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvre Lüks Gümüş Mücevher Koleksiyonu',
+        alt: 'Silvre Lüks Gümüş Mücevher Koleksiyonu - 999 Ayar Saf Gümüş',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Silvre - Lüks Gümüş Mücevher',
-    description: 'Kişiye özel %100 el işçiliği lüks gümüş takılar',
+    title: 'Silvre - 999 Ayar Saf Gümüş Mücevher',
+    description: 'Kişiye özel %100 el işçiliği lüks 999 ayar saf gümüş takılar',
     images: ['/uploads/images/anasayfa_background_3.jpg'],
   },
   alternates: {
@@ -100,7 +105,7 @@ export default async function HomePage() {
     alternateName: 'Silvre Jewelry',
     url: 'https://silvre.com.tr',
     logo: 'https://silvre.com.tr/uploads/images/silvre-logo-black.png',
-    description: 'Lüks gümüş mücevher ve el yapımı 925 ayar gümüş takı koleksiyonu',
+    description: 'Lüks gümüş mücevher ve el yapımı 999 ayar saf gümüş takı koleksiyonu. %99.9 saflıkta fine silver.',
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'TR',
@@ -138,6 +143,7 @@ export default async function HomePage() {
         name: product.name,
         url: `https://silvre.com.tr/products/${product.slug}`,
         image: product.images[0]?.imageUrl,
+        material: '999 Ayar Saf Gümüş',
         offers: {
           '@type': 'Offer',
           price: product.discountPrice || product.price,
@@ -163,65 +169,84 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      {/* Hero Section - Full Screen with Background */}
-      <section className="relative min-h-screen flex items-center overflow-hidden -mt-16 sm:-mt-[68px]">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/uploads/images/anasayfa_background_3.jpg"
-            alt="Silvre lüks gümüş mücevher koleksiyonu - El yapımı 925 ayar gümüş takılar"
-            fill
-            className="object-cover"
-            priority
-            quality={85}
-          />
-          {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent"></div>
-        </div>
+{/* Hero Section - VIDEO BACKGROUND */}
+<section className="relative min-h-screen flex items-center overflow-hidden -mt-16 sm:-mt-[68px]">
+  {/* Background Container */}
+  <div className="absolute inset-0 z-0">
+    {/* Desktop: Video */}
+    <video
+      autoPlay
+      loop
+      muted
+      playsInline
+      poster="/uploads/images/anasayfa_background_3.jpg"
+      className="hidden md:block absolute w-full h-full object-cover"
+   
+    >
+      <source src="/videos/jewelry.mp4" type="video/mp4" />
+    </video>
+    
+    {/* Mobile: Image + Desktop Fallback */}
+    <Image
+      src="/uploads/images/anasayfa_background_3.jpg"
+      alt="Silvre lüks gümüş mücevher koleksiyonu - El yapımı 999 ayar saf gümüş takılar"
+      fill
+      className="md:hidden object-cover"
+      priority
+      quality={85}
+    />
+    
+    {/* Gradient Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+  </div>
 
-        {/* Hero Content */}
-        <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-24 sm:pt-32">
-          <div className="max-w-xl lg:max-w-2xl hero-content">
-            {/* SEO H1 - Görsel olarak gizli ama SEO için kritik */}
-            <h1 className="sr-only">
-              Silvre - Lüks Gümüş Mücevher | Kişiye Özel El Yapımı 925 Ayar Gümüş Takılar
-            </h1>
-            
-            {/* Görsel başlık */}
-            <div 
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" 
-              aria-hidden="true"
-            >
-              Zarif & Lüks
-            </div>
-            
-            <div className="space-y-3 mb-10">
-              <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
-                Gümüşle gelen şıklığın en yeni yorumu.
-              </p>
-              <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
-                Kişiye özel %100 el işçiliği lüks gümüş takılar.
-              </p>
-            </div>
+  {/* Hero Content */}
+  <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-24 sm:pt-32">
+    <div className="max-w-xl lg:max-w-2xl hero-content">
+      {/* SEO H1 */}
+      <h1 className="sr-only">
+        Silvre - Lüks Gümüş Mücevher | Kişiye Özel El Yapımı 999 Ayar Saf Gümüş Takılar
+      </h1>
+      
+      {/* Görsel başlık */}
+      <div 
+        className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" 
+        aria-hidden="true"
+      >
+        Zarif & Lüks
+      </div>
+      
+      <div className="space-y-3 mb-10">
+        <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
+          %99.9 saflıkta gümüşle gelen şıklığın en yeni yorumu.
+        </p>
+        <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
+          Kişiye özel %100 el işçiliği 999 ayar saf gümüş takılar.
+        </p>
+        <p className="text-sm sm:text-base text-white/80 font-light italic mt-4">
+          ✨ Sterling gümüşten daha saf, daha değerli
+        </p>
+      </div>
 
-            <div>
-              <Link 
-                href="/products" 
-                className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
-                aria-label="Silvre gümüş takı koleksiyonunu keşfedin"
-              >
-                Koleksiyonu Keşfet
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div>
+        <Link 
+          href="/products" 
+          className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
+          aria-label="Silvre 999 ayar saf gümüş takı koleksiyonunu keşfedin"
+        >
+          Koleksiyonu Keşfet
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Featured Products */}
       <section className="section section-white" aria-labelledby="featured-heading">
         <div className="container mx-auto px-4">
           <h2 id="featured-heading" className="section-title">Öne Çıkan Lüks Gümüş Koleksiyon</h2>
-          <p className="section-subtitle">El yapımı, 925 ayar özel tasarım gümüş takılar</p>
+          <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
 
           <div className="products-grid">
             {featuredProducts.map((product) => {
@@ -239,8 +264,8 @@ export default async function HomePage() {
                     price: product.price,
                     discountPrice: product.discountPrice,
                     image: primaryImage,
-                    rating: 4.8, // TODO: Veritabanından al
-                    reviewCount: 124, // TODO: Veritabanından al
+                    rating: 4.8,
+                    reviewCount: 124,
                     isPremium: product.isFeatured || false
                   }}
                 />
@@ -253,8 +278,8 @@ export default async function HomePage() {
       {/* Categories Section */}
       <section className="section section-gray" aria-labelledby="categories-heading">
         <div className="container mx-auto px-4">
-          <h2 id="categories-heading" className="section-title">Gümüş Takı Koleksiyonları</h2>
-          <p className="section-subtitle">Her tarza uygun özel tasarım 925 ayar gümüş mücevherler</p>
+          <h2 id="categories-heading" className="section-title">Saf Gümüş Takı Koleksiyonları</h2>
+          <p className="section-subtitle">Her tarza uygun özel tasarım 999 ayar saf gümüş mücevherler</p>
 
           <nav aria-label="Ürün kategorileri">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -263,13 +288,13 @@ export default async function HomePage() {
                   key={category.id}
                   href={`/categories/${category.slug}`}
                   className="group card hover-lift overflow-hidden"
-                  aria-label={`${category.name} kategorisindeki gümüş takıları görüntüle`}
+                  aria-label={`${category.name} kategorisindeki 999 ayar saf gümüş takıları görüntüle`}
                 >
                   <div className="aspect-[4/3] relative bg-gray-100">
                     {category.imageUrl ? (
                       <Image
                         src={category.imageUrl}
-                        alt={`${category.name} - 925 ayar gümüş ${category.name.toLowerCase()} koleksiyonu`}
+                        alt={`${category.name} - 999 ayar saf gümüş ${category.name.toLowerCase()} koleksiyonu`}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
@@ -290,6 +315,54 @@ export default async function HomePage() {
               ))}
             </div>
           </nav>
+        </div>
+      </section>
+
+      {/* 999 Ayar Farkı - YENİ BÖLÜM */}
+      <section className="section section-white bg-gradient-to-br from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-serif font-light italic mb-6 text-gray-900">
+              999 Ayar Saf Gümüş Farkı
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              %99.9 saflıkta gümüş ile en yüksek kalite standardı
+            </p>
+            
+            <div className="grid md:grid-cols-2 gap-8 mt-8">
+              <div className="p-8 bg-white rounded-lg shadow-md border-2 border-gold-accent">
+                <div className="text-4xl mb-4">✨</div>
+                <h3 className="text-2xl font-semibold mb-3 text-gray-800">
+                  999 Ayar (Fine Silver)
+                </h3>
+                <div className="text-3xl font-bold text-gold-accent mb-3">%99.9</div>
+                <p className="text-gray-600 mb-4 font-medium">Saf Gümüş - Silvre Standardı</p>
+                <ul className="text-left text-sm text-gray-600 space-y-2">
+                  <li>✓ En yüksek saflık</li>
+                  <li>✓ Hipoalerjenik</li>
+                  <li>✓ Doğal parlak görünüm</li>
+                  <li>✓ Prestijli ve nadir</li>
+                  <li>✓ Daha yüksek değer</li>
+                </ul>
+              </div>
+              
+              <div className="p-8 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="text-4xl mb-4 opacity-50">⭐</div>
+                <h3 className="text-2xl font-semibold mb-3 text-gray-600">
+                  925 Ayar (Sterling Silver)
+                </h3>
+                <div className="text-3xl font-bold text-gray-500 mb-3">%92.5</div>
+                <p className="text-gray-500 mb-4">Gümüş + %7.5 Alaşım</p>
+                <ul className="text-left text-sm text-gray-400 space-y-2">
+                  <li>• Standart kalite</li>
+                  <li>• Diğer metallerle karışık</li>
+                  <li>• Daha mat görünüm</li>
+                  <li>• Yaygın kullanım</li>
+                  <li>• Düşük değer</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -320,9 +393,10 @@ export default async function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="font-serif text-xl mb-3">925 Ayar Gümüş</h3>
+              <h3 className="font-serif text-xl mb-3">999 Ayar Saf Gümüş</h3>
               <p className="text-gray-600 leading-relaxed">
-                Sadece en kaliteli, sertifikalı 925 ayar gümüş kullanıyoruz. Her ürün kalite garantisi ile gelir.
+                %99.9 saflıkta, sertifikalı 999 ayar saf gümüş (fine silver) kullanıyoruz. 
+                En yüksek kalite standardı ile her ürün kalite garantisi ile gelir.
               </p>
             </article>
 
@@ -334,7 +408,8 @@ export default async function HomePage() {
               </div>
               <h3 className="font-serif text-xl mb-3">Kişiye Özel Tasarım</h3>
               <p className="text-gray-600 leading-relaxed">
-                Kişiye özel tasarım ve üretim hizmeti sunuyoruz. Hayalinizdeki mücevheri birlikte tasarlayalım.
+                Kişiye özel tasarım ve üretim hizmeti sunuyoruz. 999 ayar saf gümüş ile 
+                hayalinizdeki mücevheri birlikte tasarlayalım.
               </p>
             </article>
           </div>
@@ -344,7 +419,7 @@ export default async function HomePage() {
       {/* YENİ: Instagram Feed */}
       <InstagramFeed />
 
-      {/* SEO Text Content */}
+      {/* SEO Text Content - 999 AYAR VURGUSU */}
       <section className="section section-white bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">
           <article className="prose prose-lg mx-auto">
@@ -353,19 +428,24 @@ export default async function HomePage() {
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
               <strong>Silvre</strong>, Türkiye'nin en prestijli lüks gümüş mücevher markasıdır. 
-              %100 el işçiliği ile üretilen <strong>925 ayar gümüş takılar</strong>ımız, modern minimalizm 
-              ile klasik zarafetin mükemmel birleşimini sunar. Her bir parça, deneyimli ustalarımız 
-              tarafından özenle tasarlanır ve üretilir.
+              %100 el işçiliği ile üretilen <strong>999 ayar saf gümüş takılar</strong>ımız, 
+              modern minimalizm ile klasik zarafetin mükemmel birleşimini sunar. 
+              <strong>%99.9 saflıkta gümüş</strong> (fine silver) kullanarak, her bir parçayı 
+              deneyimli ustalarımız tarafından özenle tasarlıyor ve üretiyoruz.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Koleksiyonumuzda <strong>gümüş kolye</strong>, <strong>gümüş küpe</strong>, 
-              <strong>gümüş yüzük</strong> ve <strong>gümüş bileklik</strong> modelleri bulunmaktadır. 
+              Koleksiyonumuzda <strong>999 ayar saf gümüş kolye</strong>, 
+              <strong>999 ayar saf gümüş küpe</strong>, <strong>999 ayar saf gümüş yüzük</strong> 
+              ve <strong>999 ayar saf gümüş bileklik</strong> modelleri bulunmaktadır. 
               Kişiye özel tasarım hizmetimiz ile hayalinizdeki mücevheri gerçeğe dönüştürüyoruz.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              <strong>Premium gümüş takı</strong> arayanlar için ideal olan Silvre, butik üretim 
-              anlayışı ile her müşterisine özel deneyim sunmaktadır. Sertifikalı gümüş malzeme, 
-              kalite garantisi ve üstün işçilik ile lüks mücevher dünyasında fark yaratıyoruz.
+              <strong>999 ayar saf gümüş takı</strong> arayanlar için ideal olan Silvre, 
+              butik üretim anlayışı ile her müşterisine özel deneyim sunmaktadır. 
+              Sertifikalı <strong>fine silver (999 ayar)</strong> malzeme, kalite garantisi 
+              ve üstün işçilik ile lüks mücevher dünyasında fark yaratıyoruz. Sterling silver 
+              (%92.5) yerine %99.9 saflıkta gümüş kullanarak, size en yüksek kalite ve 
+              değeri sunuyoruz.
             </p>
           </article>
         </div>

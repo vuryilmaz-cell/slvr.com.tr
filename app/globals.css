@@ -471,3 +471,44 @@
 .hero-content > div:nth-child(3) {
   animation: fadeInUp 1s ease-out 0.6s backwards;
 }
+
+
+/* ===================================
+   999 AYAR RENK PALETİ
+   =================================== */
+
+   :root {
+    /* Lüks Metalik Renkler */
+    --gold-accent: #D4AF37;
+    --silver-shine: #C0C0C0;
+    --silver-dark: #8C8C8C;
+    --rose-gold: #B76E79;
+    
+    /* Nötr Tonlar */
+    --luxury-cream: #FAF8F5;
+    --luxury-beige: #E8E3DC;
+    --charcoal: #2C2C2C;
+  }
+  
+  /* Utility Classes */
+  .border-gold-accent {
+    border-color: var(--gold-accent);
+  }
+  
+  .text-gold-accent {
+    color: var(--gold-accent);
+  }
+  
+  .bg-gold-accent {
+    background-color: var(--gold-accent);
+  }
+  
+  /* Video Background Optimization */
+  video {
+    object-fit: cover;
+  }
+  
+  video[poster] {
+    background-size: cover;
+    background-position: center;
+  }
