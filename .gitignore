@@ -35,5 +35,6 @@ prisma/dev.db
 prisma/dev.db-journal
 
 # uploads
+/public/videos/*
 /public/uploads/*
 !/public/uploads/.gitkeep
