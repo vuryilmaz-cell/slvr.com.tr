@@ -55,7 +55,7 @@ export default function Navbar() {
           isHomePage 
             ? (scrolled 
                 ? 'bg-white shadow-sm' 
-                : 'bg-black/20'
+                : 'bg-black/30'
               )
             : (scrolled 
                 ? 'bg-white/98 backdrop-blur-md shadow-sm' 

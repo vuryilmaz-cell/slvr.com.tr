@@ -170,31 +170,33 @@ export default async function HomePage() {
       />
 
 {/* Hero Section */}
-<section className="relative min-h-screen flex items-center overflow-hidden -mt-20 sm:-mt-[80px]">
-  {/* Background - TAM EKRAN */}
-  <div className="absolute inset-0">  {/* z-0 kaldırıldı */}
+<section className="relative min-h-screen flex items-center overflow-hidden -mt-[85px]">
+  {/* Background Container */}
+  <div className="absolute inset-0">
     {/* Desktop: Video */}
     <video
-      autoPlay
-      loop
-      muted
-      playsInline
-      poster="/uploads/images/anasayfa_background_3.jpg"
-      className="hidden md:block absolute top-0 left-0 w-full h-full object-cover"
-      style={{
-        objectFit: 'cover',
-        objectPosition: 'center',
-        minWidth: '100%',
-        minHeight: '100%'
-      }}
-    >
-      <source src="/videos/hero-bg.mp4" type="video/mp4" />
-    </video>
+  autoPlay
+  loop
+  muted
+  playsInline
+  poster="/uploads/images/anasayfa_background_3.jpg"
+  className="hidden md:block absolute top-0 left-0 w-full h-full"
+  style={{
+    objectFit: 'cover',
+    objectPosition: 'center',
+    transform: 'scale(1.2) scaleX(-1)' ,  /* %20 büyüt, siyah bandları gizle */
+    minWidth: '100%',
+    minHeight: '100%',
+    filter: 'brightness(0.7)'  /* %80 parlaklık = daha koyu */
+  }}
+>
+  <source src="/videos/jewelry.mp4" type="video/mp4" />
+</video>
     
     {/* Mobile: Image */}
     <Image
       src="/uploads/images/anasayfa_background_3.jpg"
-      alt="Silvre lüks gümüş mücevher koleksiyonu"
+      alt="Silvre lüks gümüş mücevher koleksiyonu - El yapımı 999 ayar saf gümüş takılar"
       fill
       className="md:hidden object-cover"
       priority
@@ -206,7 +208,7 @@ export default async function HomePage() {
     <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
   </div>
 
-  {/* Hero Content - Üstte */}
+  {/* Hero Content */}
   <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-24 sm:pt-32">
     <div className="max-w-xl lg:max-w-2xl hero-content">
       <h1 className="sr-only">
@@ -236,6 +238,7 @@ export default async function HomePage() {
         <Link 
           href="/products" 
           className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
+          aria-label="Silvre 999 ayar saf gümüş takı koleksiyonunu keşfedin"
         >
           KOLEKSİYONU KEŞFET
         </Link>
