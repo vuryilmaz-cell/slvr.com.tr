@@ -242,11 +242,11 @@ export default async function HomePage() {
 </section>
 
 
-      {/* Featured Products */}
-      <section className="section section-white" aria-labelledby="featured-heading">
-        <div className="container mx-auto px-4">
-          <h2 id="featured-heading" className="section-title">Öne Çıkan Lüks Gümüş Koleksiyon</h2>
-          <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
+   {/* Featured Products */}
+<section className="section section-white" aria-labelledby="featured-heading">
+  <div className="container mx-auto px-4">
+    <h2 id="featured-heading" className="section-title">Öne Çıkan Lüks Gümüş Koleksiyon</h2>
+    <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
 
           <div className="products-grid">
             {featuredProducts.map((product) => {
