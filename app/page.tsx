@@ -77,7 +77,7 @@ export default function HomePage() {
         </div>
 
         {/* Hero Content */}
-        <div className="container mx-auto px-6 sm:px-8 md:px-12 lg:px-16 relative z-10 pt-24 sm:pt-32">
+        <div className="container mx-auto px-5 sm:px-5 md:px-5 lg:px-5 relative z-10 pt-24 sm:pt-32">
           <div className="max-w-xl lg:max-w-2xl hero-content">
             <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide">
               Zarif & Lüks
