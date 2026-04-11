@@ -3,14 +3,28 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { formatPrice } from '@/lib/utils'
 import type { Metadata } from 'next'
-
-// YENİ COMPONENTS
-import LuxuryProductCard from '@/components/LuxuryProductCard'
 import InstagramFeed from '@/components/InstagramFeed'
 import TestimonialsSlider from '@/components/TestimonialsSlider'
 
 // Server Component - SEO için kritik
 export const revalidate = 3600 // 1 saat cache
+
+interface Product {
+  id: number
+  name: string
+  slug: string
+  price: number
+  discountPrice: number | null
+  category: { id: number; name: string }
+  images: { imageUrl: string }[]
+}
+
+interface Category {
+  id: number
+  name: string
+  slug: string
+  imageUrl: string | null
+}
 
 // SEO Metadata
 export const metadata: Metadata = {
@@ -173,7 +187,7 @@ export default async function HomePage() {
             fill
             className="object-cover"
             priority
-            quality={85}
+            quality={95}
           />
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-black/20 to-transparent"></div>
@@ -188,10 +202,7 @@ export default async function HomePage() {
             </h1>
             
             {/* Görsel başlık */}
-            <div 
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" 
-              aria-hidden="true"
-            >
+            <div className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" aria-hidden="true">
               Zarif & Lüks
             </div>
             
@@ -229,21 +240,58 @@ export default async function HomePage() {
               const displayPrice = product.discountPrice || product.price
 
               return (
-                <LuxuryProductCard
+                <article 
                   key={product.id}
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    slug: product.slug,
-                    category: product.category.name,
-                    price: product.price,
-                    discountPrice: product.discountPrice,
-                    image: primaryImage,
-                    rating: 4.8, // TODO: Veritabanından al
-                    reviewCount: 124, // TODO: Veritabanından al
-                    isPremium: product.isFeatured || false
-                  }}
-                />
+                  itemScope
+                  itemType="https://schema.org/Product"
+                >
+                  <Link 
+                    href={`/products/${product.slug}`}
+                    className="group card hover-lift block"
+                    aria-label={`${product.name} - ${product.category.name} - ${formatPrice(displayPrice)}`}
+                  >
+                    <div className="aspect-square relative bg-gray-50 overflow-hidden">
+                      <Image
+                        src={primaryImage}
+                        alt={`${product.name} - 925 ayar gümüş ${product.category.name.toLowerCase()} - Silvre lüks mücevher`}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        itemProp="image"
+                      />
+                      {product.discountPrice && (
+                        <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 text-xs font-medium rounded uppercase tracking-wide">
+                          İndirim
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="p-4">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-2" itemProp="category">
+                        {product.category.name}
+                      </p>
+                      <h3 className="font-serif font-light text-lg mb-3 group-hover:text-gray-600 transition-colors" itemProp="name">
+                        {product.name}
+                      </h3>
+                      <div className="flex items-center gap-3" itemProp="offers" itemScope itemType="https://schema.org/Offer">
+                        <meta itemProp="priceCurrency" content="TRY" />
+                        <meta itemProp="price" content={displayPrice.toString()} />
+                        {product.discountPrice ? (
+                          <>
+                            <span className="font-medium text-red-600">
+                              {formatPrice(product.discountPrice)}
+                            </span>
+                            <span className="text-sm text-gray-400 line-through">
+                              {formatPrice(product.price)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="font-medium">{formatPrice(product.price)}</span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                </article>
               )
             })}
           </div>
@@ -293,9 +341,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* YENİ: Müşteri Yorumları */}
-      <TestimonialsSlider />
-
       {/* Why Choose Us */}
       <section className="section section-white" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
@@ -341,9 +386,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* YENİ: Instagram Feed */}
-      <InstagramFeed />
-
       {/* SEO Text Content */}
       <section className="section section-white bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">
@@ -358,7 +400,7 @@ export default async function HomePage() {
               tarafından özenle tasarlanır ve üretilir.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Koleksiyonumuzda <strong>gümüş kolye</strong>, <strong>gümüş küpe</strong>, 
+              Koleksi yonumuzda <strong>gümüş kolye</strong>, <strong>gümüş küpe</strong>, 
               <strong>gümüş yüzük</strong> ve <strong>gümüş bileklik</strong> modelleri bulunmaktadır. 
               Kişiye özel tasarım hizmetimiz ile hayalinizdeki mücevheri gerçeğe dönüştürüyoruz.
             </p>
