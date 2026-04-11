@@ -170,7 +170,7 @@ export default async function HomePage() {
       />
 
 {/* Hero Section */}
-<section className="relative min-h-screen flex items-center overflow-hidden -mt-[85px]">
+<section className="relative min-h-screen flex items-center overflow-hidden -mt-[70px]">
   {/* Background Container */}
   <div className="absolute inset-0">
     {/* Desktop: Video */}
