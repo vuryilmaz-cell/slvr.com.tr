@@ -25,59 +25,158 @@ const productSchema = z.object({
   })).optional(),
 })
 
+function parseMultiValue(value: string | null): string[] {
+  if (!value) return []
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function buildPriceFilter(priceRanges: string[]) {
+  if (!priceRanges.length) return undefined
+
+  const ranges = priceRanges
+    .map((range) => {
+      if (range === '0-250') {
+        return { price: { gte: 0, lte: 250 } }
+      }
+      if (range === '250-500') {
+        return { price: { gt: 250, lte: 500 } }
+      }
+      if (range === '500-1000') {
+        return { price: { gt: 500, lte: 1000 } }
+      }
+      if (range === '1000-plus') {
+        return { price: { gt: 1000 } }
+      }
+      return null
+    })
+    .filter(Boolean)
+
+  return ranges.length ? ranges : undefined
+}
+
 // GET /api/products - List products with filters
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    
+
     const category = searchParams.get('category')
     const featured = searchParams.get('featured')
+    const discounted = searchParams.get('discounted')
     const search = searchParams.get('search')
-    const sort = searchParams.get('sort') || 'displayOrder'
-    const order = searchParams.get('order') || 'asc'
+
+    const genderValues = parseMultiValue(searchParams.get('gender'))
+    const categoryValues = parseMultiValue(searchParams.get('categories'))
+    const priceValues = parseMultiValue(searchParams.get('price'))
+
+    const sortParam = searchParams.get('sort') || 'display'
     const limit = parseInt(searchParams.get('limit') || '20')
     const offset = parseInt(searchParams.get('offset') || '0')
-    
-    // Check if user is admin
+
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null
     const isAdmin = user?.role === 'admin'
-    
+
     const where: any = {}
-    
-    // Non-admin users only see active products
+
     if (!isAdmin) {
       where.isActive = true
     }
-    
+
+    const andFilters: any[] = []
+
     if (category) {
-      where.category = { slug: category }
+      andFilters.push({
+        category: { slug: category },
+      })
     }
-    
+
+    if (categoryValues.length) {
+      andFilters.push({
+        category: {
+          slug: { in: categoryValues },
+        },
+      })
+    }
+
     if (featured === 'true') {
-      where.isFeatured = true
+      andFilters.push({
+        isFeatured: true,
+      })
     }
-    
+
+    if (discounted === 'true') {
+      andFilters.push({
+        discountPrice: {
+          not: null,
+        },
+      })
+    }
+
+    if (genderValues.length) {
+      const genderConditions = genderValues.map((gender) => ({
+        OR: [
+          {
+            name: {
+              contains: gender,
+            },
+          },
+          {
+            description: {
+              contains: gender,
+            },
+          },
+        ],
+      }))
+
+      andFilters.push({
+        OR: genderConditions,
+      })
+    }
+
+    const priceFilter = buildPriceFilter(priceValues)
+    if (priceFilter) {
+      andFilters.push({
+        OR: priceFilter,
+      })
+    }
+
     if (search) {
-      where.OR = [
-        { name: { contains: search } },
-        { description: { contains: search } },
-      ]
+      andFilters.push({
+        OR: [
+          { name: { contains: search } },
+          { description: { contains: search } },
+        ],
+      })
     }
-    
-    const orderBy: any = {}
-    const allowedSorts = ['createdAt', 'price', 'name', 'views', 'displayOrder']
-    const sortField = allowedSorts.includes(sort) ? sort : 'displayOrder'
-    orderBy[sortField] = order === 'desc' ? 'desc' : 'asc'
-    
+
+    if (andFilters.length) {
+      where.AND = andFilters
+    }
+
+    let orderBy: any = { displayOrder: 'asc' }
+
+    if (sortParam === 'newest') {
+      orderBy = { createdAt: 'desc' }
+    } else if (sortParam === 'price-asc') {
+      orderBy = { price: 'asc' }
+    } else if (sortParam === 'price-desc') {
+      orderBy = { price: 'desc' }
+    } else if (sortParam === 'name-asc') {
+      orderBy = { name: 'asc' }
+    } else if (sortParam === 'name-desc') {
+      orderBy = { name: 'desc' }
+    }
+
     const [products, total] = await Promise.all([
       prisma.product.findMany({
         where,
         include: {
           category: true,
           images: {
-            where: { isPrimary: true },
-            take: 1,
+            orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }],
           },
         },
         orderBy,
@@ -86,7 +185,7 @@ export async function GET(request: Request) {
       }),
       prisma.product.count({ where }),
     ])
-    
+
     return NextResponse.json({
       products,
       pagination: {
@@ -108,35 +207,29 @@ export async function GET(request: Request) {
 // POST /api/products - Create product (Admin only)
 export async function POST(request: Request) {
   try {
-    // Check authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null
-    
+
     if (!user || user.role !== 'admin') {
       return NextResponse.json(
         { error: { message: 'Yetkiniz yok' } },
         { status: 403 }
       )
     }
-    
+
     const body = await request.json()
-    
-    // Validate input
     const validatedData = productSchema.parse(body)
-    
-    // Generate slug if not provided
+
     let slug = validatedData.slug || generateSlug(validatedData.name)
-    
-    // Ensure slug is unique
+
     const existingSlug = await prisma.product.findUnique({
       where: { slug },
     })
-    
+
     if (existingSlug) {
       slug = `${slug}-${Date.now()}`
     }
-    
-    // Get next display order if not provided
+
     let displayOrder = validatedData.displayOrder
     if (!displayOrder) {
       const maxOrder = await prisma.product.findFirst({
@@ -145,10 +238,9 @@ export async function POST(request: Request) {
       })
       displayOrder = (maxOrder?.displayOrder || 0) + 1
     }
-    
-    // Create product
+
     const { images, ...productData } = validatedData
-    
+
     const product = await prisma.product.create({
       data: {
         ...productData,
@@ -159,7 +251,7 @@ export async function POST(request: Request) {
             imageUrl: img.imageUrl,
             isPrimary: img.isPrimary || index === 0,
             displayOrder: img.displayOrder || index,
-          }))
+          })),
         } : undefined,
       },
       include: {
@@ -167,7 +259,7 @@ export async function POST(request: Request) {
         images: true,
       },
     })
-    
+
     return NextResponse.json(
       {
         message: 'Ürün başarıyla eklendi',
@@ -182,7 +274,7 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
-    
+
     console.error('Create product error:', error)
     return NextResponse.json(
       { error: { message: 'Ürün eklenirken hata oluştu' } },
