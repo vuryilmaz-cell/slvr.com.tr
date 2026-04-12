@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
 
 interface Product {
@@ -36,12 +36,25 @@ export default function ProductsClient({
   initialSort = 'display',
 }: Props) {
   const router = useRouter()
-  const pathname = usePathname()
 
   const [products, setProducts] = useState(initialProducts)
   const [currentSort, setCurrentSort] = useState(initialSort)
   const [activeCategory, setActiveCategory] = useState(initialCategory || '')
   const [isPending, startTransition] = useTransition()
+
+  const buildUrl = (category: string, sort: string) => {
+    const qs = new URLSearchParams()
+
+    if (sort && sort !== 'display') {
+      qs.set('sort', sort)
+    }
+
+    if (category) {
+      return `/categories/${category}${qs.toString() ? `?${qs.toString()}` : ''}`
+    }
+
+    return `/products${qs.toString() ? `?${qs.toString()}` : ''}`
+  }
 
   const fetchProducts = (category: string, sort: string) => {
     startTransition(async () => {
@@ -63,25 +76,26 @@ export default function ProductsClient({
 
   const handleCategoryChange = (slug: string) => {
     setActiveCategory(slug)
-    // URL'i güncelle (SEO + geri butonu için)
-    const qs = new URLSearchParams()
-    if (slug) qs.set('category', slug)
-    if (currentSort !== 'display') qs.set('sort', currentSort)
-    router.push(`${pathname}${qs.size ? '?' + qs.toString() : ''}`, { scroll: false })
+
+    const nextUrl = buildUrl(slug, currentSort)
+    router.push(nextUrl, { scroll: false })
+
     fetchProducts(slug, currentSort)
   }
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const sort = e.target.value
     setCurrentSort(sort)
+
+    const nextUrl = buildUrl(activeCategory, sort)
+    router.push(nextUrl, { scroll: false })
+
     fetchProducts(activeCategory, sort)
   }
 
   return (
     <section className="section section-white">
       <div className="container mx-auto px-4">
-
-        {/* Category Filters */}
         <nav aria-label="Kategori filtreleri" className="flex flex-wrap gap-3 mb-8 justify-center">
           <button
             onClick={() => handleCategoryChange('')}
@@ -93,6 +107,7 @@ export default function ProductsClient({
           >
             Tümü
           </button>
+
           {categories.map((category) => (
             <button
               key={category.id}
@@ -108,11 +123,11 @@ export default function ProductsClient({
           ))}
         </nav>
 
-        {/* Sort & Count */}
         <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
           <p className="text-sm text-gray-600">
             <span className="font-medium text-gray-900">{products.length}</span> ürün bulundu
           </p>
+
           <select
             className="form-input max-w-xs text-sm"
             value={currentSort}
@@ -127,7 +142,6 @@ export default function ProductsClient({
           </select>
         </div>
 
-        {/* Products Grid */}
         {products.length > 0 ? (
           <div className={`products-grid transition-opacity ${isPending ? 'opacity-60' : 'opacity-100'}`}>
             {products.map((product) => {
@@ -135,6 +149,7 @@ export default function ProductsClient({
                 product.images.find((img) => img.isPrimary)?.imageUrl ||
                 product.images[0]?.imageUrl ||
                 '/placeholder.jpg'
+
               const displayPrice = product.discountPrice || product.price
 
               return (
@@ -157,6 +172,7 @@ export default function ProductsClient({
                       </span>
                     )}
                   </div>
+
                   <div className="p-4">
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                       {product.category.name}

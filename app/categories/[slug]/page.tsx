@@ -1,8 +1,6 @@
 import { prisma } from '@/lib/prisma'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { formatPrice } from '@/lib/utils'
 import type { Metadata } from 'next'
 import CategoryProductsClient from '@/components/CategoryProductsClient'
 
@@ -10,9 +8,8 @@ export const revalidate = 3600
 
 interface Props {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ sort?: string }>
 }
-
-// ─── Data fetching ────────────────────────────────────────────────────────────
 
 async function getCategory(slug: string) {
   return prisma.category.findUnique({
@@ -22,10 +19,11 @@ async function getCategory(slug: string) {
 
 async function getProducts(slug: string, sort = 'display') {
   const orderBy: Record<string, string>[] = []
-  if (sort === 'newest')     orderBy.push({ createdAt: 'desc' })
-  else if (sort === 'price-asc')  orderBy.push({ price: 'asc' })
+
+  if (sort === 'newest') orderBy.push({ createdAt: 'desc' })
+  else if (sort === 'price-asc') orderBy.push({ price: 'asc' })
   else if (sort === 'price-desc') orderBy.push({ price: 'desc' })
-  else                        orderBy.push({ displayOrder: 'asc' })
+  else orderBy.push({ displayOrder: 'asc' })
 
   return prisma.product.findMany({
     where: { category: { slug }, isActive: true },
@@ -37,11 +35,10 @@ async function getProducts(slug: string, sort = 'display') {
   })
 }
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const category = await getCategory(slug)
+
   if (!category) return { title: 'Kategori Bulunamadı' }
 
   const title = `${category.name} | Silvre Lüks Gümüş Mücevher`
@@ -83,25 +80,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
-export default async function CategoryPage({ params }: Props) {
+export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params
+  const { sort = 'display' } = await searchParams
+
   const [category, products] = await Promise.all([
     getCategory(slug),
-    getProducts(slug),
+    getProducts(slug, sort),
   ])
 
   if (!category) notFound()
-
-  // ── Structured Data ──────────────────────────────────────────────────────────
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Ana Sayfa',  item: 'https://slvr.com.tr' },
-      { '@type': 'ListItem', position: 2, name: 'Ürünler',    item: 'https://slvr.com.tr/products' },
+      { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://slvr.com.tr' },
+      { '@type': 'ListItem', position: 2, name: 'Ürünler', item: 'https://slvr.com.tr/products' },
       { '@type': 'ListItem', position: 3, name: category.name, item: `https://slvr.com.tr/categories/${slug}` },
     ],
   }
@@ -123,7 +118,6 @@ export default async function CategoryPage({ params }: Props) {
 
   return (
     <>
-      {/* ── JSON-LD ── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -133,11 +127,8 @@ export default async function CategoryPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      {/* ── Hero ── */}
       <section className="bg-gradient-to-br from-[#faf8f5] to-[#f5f3f0] py-16">
         <div className="container mx-auto px-4">
-
-          {/* Breadcrumb — semantic nav ile */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <Link href="/" className="hover:text-gray-900 transition-colors">Ana Sayfa</Link>
             <span aria-hidden="true">/</span>
@@ -159,11 +150,11 @@ export default async function CategoryPage({ params }: Props) {
         </div>
       </section>
 
-      {/* ── Products — sort interaktif olduğu için Client Component ── */}
       <CategoryProductsClient
         initialProducts={products}
         categorySlug={slug}
         categoryName={category.name}
+        initialSort={sort}
       />
     </>
   )
