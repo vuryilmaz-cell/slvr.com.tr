@@ -178,18 +178,18 @@ export default async function HomePage() {
   autoPlay
   muted
   playsInline
-  poster="/uploads/images/anasayfa_background_3.jpg"
+  poster="/uploads/images/anasayfa_background.jpg"
   className="hidden md:block absolute top-0 left-0 w-full h-full"
   style={{
     objectFit: 'cover',
     objectPosition: 'center',
-    transform: 'scale(1.2) scaleX(-1)' ,  /* %20 büyüt, siyah bandları gizle */
+    transform: 'scale(1.2) scaleX(1)' ,  /* %20 büyüt, siyah bandları gizle */
     minWidth: '100%',
     minHeight: '100%',
-    filter: 'brightness(0.7)'  /* %80 parlaklık = daha koyu */
+    filter: 'brightness(1)'  /* %80 parlaklık = daha koyu */
   }}
 >
-  <source src="/videos/jewelry.mp4" type="video/mp4" />
+  <source src="/videos/hero-bg.mp4" type="video/mp4" />
 </video>
     
     {/* Mobile: Image */}

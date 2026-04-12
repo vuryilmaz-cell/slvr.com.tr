@@ -8,8 +8,6 @@ interface Props {
   searchParams: Promise<{ category?: string; featured?: string; sort?: string }>
 }
 
-// ─── Data fetching ────────────────────────────────────────────────────────────
-
 async function getCategories() {
   return prisma.category.findMany({
     where: { isActive: true },
@@ -21,10 +19,10 @@ async function getProducts(params: { category?: string; featured?: string; sort?
   const { category, featured, sort = 'display' } = params
 
   const orderBy: Record<string, string>[] = []
-  if (sort === 'newest')      orderBy.push({ createdAt: 'desc' })
-  else if (sort === 'price-asc')   orderBy.push({ price: 'asc' })
-  else if (sort === 'price-desc')  orderBy.push({ price: 'desc' })
-  else                         orderBy.push({ displayOrder: 'asc' })
+  if (sort === 'newest') orderBy.push({ createdAt: 'desc' })
+  else if (sort === 'price-asc') orderBy.push({ price: 'asc' })
+  else if (sort === 'price-desc') orderBy.push({ price: 'desc' })
+  else orderBy.push({ displayOrder: 'asc' })
 
   return prisma.product.findMany({
     where: {
@@ -40,8 +38,6 @@ async function getProducts(params: { category?: string; featured?: string; sort?
   })
 }
 
-// ─── Metadata ─────────────────────────────────────────────────────────────────
-
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams
   const { category } = params
@@ -51,6 +47,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     if (cat) {
       const title = `${cat.name} Koleksiyonu | Silvre Lüks Gümüş Mücevher`
       const description = `Silvre'nin el yapımı 999 ayar saf gümüş ${cat.name.toLowerCase()} koleksiyonu. Özel tasarım, kalite garantili lüks mücevher modelleri.`
+
       return {
         title,
         description,
@@ -61,11 +58,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
           'el yapımı gümüş takı',
           'silvre',
         ],
-        alternates: { canonical: `https://slvr.com.tr/products?category=${category}` },
+        alternates: {
+          canonical: `https://slvr.com.tr/categories/${category}`,
+        },
         openGraph: {
           title,
           description,
-          url: `https://slvr.com.tr/products?category=${category}`,
+          url: `https://slvr.com.tr/categories/${category}`,
           siteName: 'Silvre Jewelry',
           locale: 'tr_TR',
           type: 'website',
@@ -100,8 +99,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 export default async function ProductsPage({ searchParams }: Props) {
   const params = await searchParams
 
@@ -110,19 +107,23 @@ export default async function ProductsPage({ searchParams }: Props) {
     getCategories(),
   ])
 
-  // Aktif kategori bilgisi
   const activeCategory = params.category
     ? categories.find((c) => c.slug === params.category) ?? null
     : null
-
-  // ── Structured Data ──────────────────────────────────────────────────────────
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: 'https://slvr.com.tr' },
-      { '@type': 'ListItem', position: 2, name: activeCategory ? activeCategory.name : 'Ürünler', item: 'https://slvr.com.tr/products' },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: activeCategory ? activeCategory.name : 'Ürünler',
+        item: activeCategory
+          ? `https://slvr.com.tr/categories/${activeCategory.slug}`
+          : 'https://slvr.com.tr/products',
+      },
     ],
   }
 
@@ -130,8 +131,8 @@ export default async function ProductsPage({ searchParams }: Props) {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     name: activeCategory ? `${activeCategory.name} - Silvre` : 'Silvre Gümüş Mücevher Koleksiyonu',
-    url: params.category
-      ? `https://slvr.com.tr/products?category=${params.category}`
+    url: activeCategory
+      ? `https://slvr.com.tr/categories/${activeCategory.slug}`
       : 'https://slvr.com.tr/products',
     numberOfItems: products.length,
     itemListElement: products.slice(0, 10).map((product, index) => ({
@@ -144,7 +145,6 @@ export default async function ProductsPage({ searchParams }: Props) {
 
   return (
     <>
-      {/* ── JSON-LD ── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
@@ -154,7 +154,6 @@ export default async function ProductsPage({ searchParams }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      {/* ── Hero ── */}
       <section className="bg-gradient-to-br from-[#faf8f5] to-[#f5f3f0] py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-hero font-serif font-light italic mb-4 text-gray-900">
@@ -168,7 +167,6 @@ export default async function ProductsPage({ searchParams }: Props) {
         </div>
       </section>
 
-      {/* ── Products — sort + filter interaktif, Client Component ── */}
       <ProductsClient
         initialProducts={products}
         categories={categories}

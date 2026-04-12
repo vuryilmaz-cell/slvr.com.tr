@@ -7,11 +7,11 @@ import Footer from "@/components/Footer"
 
 export const metadata: Metadata = {
   title: {
-    default: "Silvre Jewelry - 925 Ayar Gümüş Takılar",
+    default: "Silvre Jewelry - 999 ayar Saf Gümüş Takılar",
     template: "%s | Silvre Jewelry"
   },
-  description: "Türkiye'nin en kaliteli 925 ayar gümüş takı markası. El yapımı kolye, küpe, yüzük ve bileklik modelleri.",
-  keywords: ["gümüş takı", "925 ayar gümüş", "kolye", "küpe", "yüzük", "bileklik", "el yapımı takı", "silvre jewelry"],
+  description: "Türkiye'nin en kaliteli 999 ayar saf gümüş takı markası. El yapımı kolye, küpe, yüzük ve bileklik modelleri.",
+  keywords: ["gümüş takı", "999 ayar saf gümüş", "kolye", "küpe", "yüzük", "bileklik", "el yapımı takı", "silvre jewelry"],
   authors: [{ name: "Silvre Jewelry" }],
   creator: "Silvre Jewelry",
   publisher: "Silvre Jewelry",
@@ -31,8 +31,8 @@ export const metadata: Metadata = {
     locale: "tr_TR",
     url: "https://slvr.com.tr",
     siteName: "Silvre Jewelry",
-    title: "Silvre Jewelry - 925 Ayar Gümüş Takılar",
-    description: "El yapımı 925 ayar gümüş takı koleksiyonu. Zarif ve lüks tasarımlar.",
+    title: "Silvre Jewelry - 999 Ayar Saf Gümüş Takılar",
+    description: "El yapımı 999 ayar saf gümüş takı koleksiyonu. Zarif ve lüks tasarımlar.",
     images: [
       {
         url: "/og-image.jpg",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Silvre Jewelry - 925 Ayar Gümüş Takılar",
+    title: "Silvre Jewelry - 999 Ayar Saf Gümüş Takılar",
     description: "El yapımı gümüş takı koleksiyonu",
     images: ["/og-image.jpg"],
   },
