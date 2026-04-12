@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-import Image from 'next/image'
+import { useState, useEffect, useCallback } from 'react'
 
 interface Testimonial {
   id: number
@@ -9,7 +8,6 @@ interface Testimonial {
   product: string
   review: string
   rating: number
-  avatar: string
   date: string
 }
 
@@ -20,8 +18,7 @@ const testimonials: Testimonial[] = [
     product: 'Zarif Gümüş Kolye',
     review: 'Muhteşem bir işçilik! Hem zarif hem de modern. Aldığım en iyi hediye oldu. Kesinlikle tavsiye ediyorum.',
     rating: 5,
-    avatar: '/avatars/avatar-1.jpg',
-    date: '2 gün önce'
+    date: '2 gün önce',
   },
   {
     id: 2,
@@ -29,8 +26,7 @@ const testimonials: Testimonial[] = [
     product: 'Premium Gümüş Bileklik',
     review: 'Eşime aldım, çok beğendi. Kalitesi gerçekten premium, her detay düşünülmüş. Teşekkürler Silvre!',
     rating: 5,
-    avatar: '/avatars/avatar-2.jpg',
-    date: '1 hafta önce'
+    date: '1 hafta önce',
   },
   {
     id: 3,
@@ -38,8 +34,7 @@ const testimonials: Testimonial[] = [
     product: 'Lüks Gümüş Küpe',
     review: 'İnanılmaz zarif! Hem günlük hem de özel günlerde kullanabiliyorum. El işçiliği çok kaliteli.',
     rating: 5,
-    avatar: '/avatars/avatar-3.jpg',
-    date: '2 hafta önce'
+    date: '2 hafta önce',
   },
   {
     id: 4,
@@ -47,8 +42,7 @@ const testimonials: Testimonial[] = [
     product: 'Minimalist Gümüş Yüzük',
     review: 'Minimalist tasarımını çok sevdim. Tam aradığım gibiydi. Kargo da çok hızlıydı.',
     rating: 5,
-    avatar: '/avatars/avatar-4.jpg',
-    date: '3 hafta önce'
+    date: '3 hafta önce',
   },
   {
     id: 5,
@@ -56,356 +50,137 @@ const testimonials: Testimonial[] = [
     product: 'Özel Tasarım Kolye',
     review: 'Kişiye özel tasarım hizmeti harika! İstediğim gibi bir kolye yaptılar. Çok mutluyum.',
     rating: 5,
-    avatar: '/avatars/avatar-5.jpg',
-    date: '1 ay önce'
-  }
+    date: '1 ay önce',
+  },
+  {
+    id: 6,
+    name: 'Selin Öztürk',
+    product: 'Gümüş Zincir Bileklik',
+    review: 'Ürün fotoğraflardaki gibi, hatta daha güzel. Ambalajı da çok özenli. Tekrar alacağım.',
+    rating: 5,
+    date: '1 ay önce',
+  },
 ]
 
+const ITEMS_PER_PAGE = 3
+
 export default function TestimonialsSlider() {
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isAutoPlaying, setIsAutoPlaying] = useState(true)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [page, setPage] = useState(0)
+  const totalPages = Math.ceil(testimonials.length / ITEMS_PER_PAGE)
 
-  const itemsPerView = typeof window !== 'undefined' && window.innerWidth < 768 ? 1 : 3
+  const next = useCallback(() => setPage(p => (p + 1) % totalPages), [totalPages])
+  const prev = () => setPage(p => (p - 1 + totalPages) % totalPages)
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => 
-      prev + itemsPerView >= testimonials.length ? 0 : prev + 1
-    )
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => 
-      prev === 0 ? Math.max(testimonials.length - itemsPerView, 0) : prev - 1
-    )
-  }
-
-  // Auto-play functionality
   useEffect(() => {
-    if (isAutoPlaying) {
-      intervalRef.current = setInterval(nextSlide, 5000)
-    }
+    const timer = setInterval(next, 5000)
+    return () => clearInterval(timer)
+  }, [next])
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [isAutoPlaying])
-
-  const handleMouseEnter = () => setIsAutoPlaying(false)
-  const handleMouseLeave = () => setIsAutoPlaying(true)
+  const visible = testimonials.slice(
+    page * ITEMS_PER_PAGE,
+    page * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+  )
 
   return (
-    <section className="testimonials-section">
-      <div className="container mx-auto px-4 py-16">
-        {/* Section Header */}
+    <section className="py-16 sm:py-20 bg-[#faf9f7]">
+      <div className="container mx-auto px-4 sm:px-6">
+
+        {/* Başlık */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-serif font-light italic text-gray-900 mb-4">
+          <h2 className="font-serif text-3xl sm:text-4xl font-light italic text-gray-900 mb-3">
             Müşterilerimiz Ne Diyor?
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-sm text-gray-400 tracking-wide">
             Binlerce mutlu müşterimizin görüşleri
           </p>
         </div>
 
-        {/* Slider Container */}
-        <div 
-          className="slider-container"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {/* Navigation Buttons */}
-          <button
-            onClick={prevSlide}
-            className="nav-button prev"
-            aria-label="Önceki yorumlar"
-          >
-            {/* ChevronLeft Icon */}
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
+        {/* Kartlar */}
+        <div className="relative">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            {visible.map((t, i) => (
+              <div
+                key={t.id}
+                className="bg-white rounded-2xl p-7 flex flex-col gap-5 border border-gray-100"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                {/* Yıldızlar */}
+                <div className="flex gap-0.5">
+                  {Array.from({ length: 5 }).map((_, s) => (
+                    <svg
+                      key={s}
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill={s < t.rating ? '#C9A96E' : 'none'}
+                      stroke={s < t.rating ? '#C9A96E' : '#d1d5db'}
+                      strokeWidth="1.5"
+                    >
+                      <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                  ))}
+                </div>
 
-          <button
-            onClick={nextSlide}
-            className="nav-button next"
-            aria-label="Sonraki yorumlar"
-          >
-            {/* ChevronRight Icon */}
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+                {/* Yorum metni */}
+                <p className="text-gray-600 text-sm leading-relaxed flex-1 italic">
+                  &ldquo;{t.review}&rdquo;
+                </p>
 
-          {/* Testimonials Track */}
-          <div className="slider-track">
-            <div
-              className="slider-items"
-              style={{
-                transform: `translateX(-${(currentIndex * 100) / itemsPerView}%)`,
-              }}
-            >
-              {testimonials.map((testimonial) => (
-                <div
-                  key={testimonial.id}
-                  className="testimonial-card"
-                  style={{ width: `${100 / itemsPerView}%` }}
-                >
-                  {/* Quote Icon */}
-                  <svg className="quote-icon" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
-                  </svg>
-
-                  {/* Rating Stars */}
-                  <div className="stars">
-                    {[...Array(5)].map((_, i) => (
-                      <svg
-                        key={i}
-                        className={`w-5 h-5 ${
-                          i < testimonial.rating ? 'star-filled' : 'star-empty'
-                        }`}
-                        fill={i < testimonial.rating ? 'currentColor' : 'none'}
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                      </svg>
-                    ))}
+                {/* Kullanıcı */}
+                <div className="flex items-center gap-3 pt-4 border-t border-gray-50">
+                  {/* Avatar baş harfi */}
+                  <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-medium text-gray-500">
+                      {t.name.charAt(0)}
+                    </span>
                   </div>
-
-                  {/* Review Text */}
-                  <p className="review-text">{testimonial.review}</p>
-
-                  {/* Author Info */}
-                  <div className="author-info">
-                    <div className="author-avatar">
-                      <div className="avatar-placeholder">
-                        {testimonial.name.charAt(0)}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="author-name">{testimonial.name}</p>
-                      <p className="author-product">{testimonial.product}</p>
-                      <p className="author-date">{testimonial.date}</p>
-                    </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">{t.name}</p>
+                    <p className="text-xs text-gray-400 truncate">{t.product} · {t.date}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Dots Indicator */}
-          <div className="dots-container">
-            {Array.from({ 
-              length: Math.ceil(testimonials.length / itemsPerView) 
-            }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index * itemsPerView)}
-                className={`dot ${
-                  Math.floor(currentIndex / itemsPerView) === index ? 'active' : ''
-                }`}
-                aria-label={`Sayfa ${index + 1}`}
-              />
+              </div>
             ))}
           </div>
+
+          {/* Ok butonları */}
+          <button
+            onClick={prev}
+            className="absolute -left-4 sm:-left-6 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-gray-400 transition-colors shadow-sm"
+            aria-label="Önceki"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            onClick={next}
+            className="absolute -right-4 sm:-right-6 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center hover:border-gray-400 transition-colors shadow-sm"
+            aria-label="Sonraki"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
         </div>
+
+        {/* Sayfa noktaları */}
+        <div className="flex justify-center gap-2 mt-8">
+          {Array.from({ length: totalPages }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setPage(i)}
+              className={`rounded-full transition-all duration-300 ${
+                i === page
+                  ? 'w-5 h-2 bg-gray-700'
+                  : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+              }`}
+              aria-label={`Sayfa ${i + 1}`}
+            />
+          ))}
+        </div>
+
       </div>
-
-      <style jsx>{`
-        .testimonials-section {
-          background: white;
-        }
-
-        .slider-container {
-          position: relative;
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 0 60px;
-        }
-
-        .slider-track {
-          overflow: hidden;
-          border-radius: 12px;
-        }
-
-        .slider-items {
-          display: flex;
-          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .testimonial-card {
-          padding: 0 15px;
-          flex-shrink: 0;
-        }
-
-        .testimonial-card > div {
-          background: linear-gradient(135deg, #faf8f5 0%, #f5f3f0 100%);
-          border-radius: 12px;
-          padding: 2rem;
-          height: 100%;
-          position: relative;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-          transition: all 0.3s ease;
-        }
-
-        .testimonial-card > div:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .quote-icon {
-          position: absolute;
-          top: 1.5rem;
-          right: 1.5rem;
-          width: 40px;
-          height: 40px;
-          color: #D4AF37;
-          opacity: 0.2;
-        }
-
-        .stars {
-          display: flex;
-          gap: 0.25rem;
-          margin-bottom: 1rem;
-        }
-
-        .star-filled {
-          color: #D4AF37;
-        }
-
-        .star-empty {
-          color: #e5e5e5;
-        }
-
-        .review-text {
-          font-size: 1rem;
-          line-height: 1.7;
-          color: #2c2c2c;
-          margin-bottom: 1.5rem;
-          font-style: italic;
-        }
-
-        .author-info {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          padding-top: 1rem;
-          border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .author-avatar {
-          position: relative;
-        }
-
-        .avatar-placeholder {
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #C0C0C0, #D4AF37);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: white;
-        }
-
-        .author-name {
-          font-weight: 600;
-          color: #2c2c2c;
-          margin-bottom: 0.25rem;
-        }
-
-        .author-product {
-          font-size: 0.875rem;
-          color: #8c8c8c;
-          margin-bottom: 0.25rem;
-        }
-
-        .author-date {
-          font-size: 0.75rem;
-          color: #a3a3a3;
-        }
-
-        /* Navigation Buttons */
-        .nav-button {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          background: white;
-          border: 1px solid #e5e5e5;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          z-index: 10;
-        }
-
-        .nav-button:hover {
-          background: #2c2c2c;
-          color: white;
-          border-color: #2c2c2c;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .nav-button.prev {
-          left: 0;
-        }
-
-        .nav-button.next {
-          right: 0;
-        }
-
-        /* Dots Indicator */
-        .dots-container {
-          display: flex;
-          justify-content: center;
-          gap: 0.5rem;
-          margin-top: 2rem;
-        }
-
-        .dot {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          background: #e5e5e5;
-          border: none;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .dot:hover,
-        .dot.active {
-          background: #D4AF37;
-          transform: scale(1.2);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-          .slider-container {
-            padding: 0 40px;
-          }
-
-          .nav-button {
-            width: 40px;
-            height: 40px;
-          }
-
-          .testimonial-card {
-            padding: 0 10px;
-          }
-
-          .testimonial-card > div {
-            padding: 1.5rem;
-          }
-        }
-      `}</style>
     </section>
   )
 }
