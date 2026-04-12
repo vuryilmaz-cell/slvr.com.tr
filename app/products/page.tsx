@@ -5,7 +5,15 @@ import ProductsClient from '@/components/ProductsClient'
 export const revalidate = 3600
 
 interface Props {
-  searchParams: Promise<{ category?: string; featured?: string; sort?: string }>
+  searchParams: Promise<{
+    category?: string
+    categories?: string
+    gender?: string
+    price?: string
+    featured?: string
+    discounted?: string
+    sort?: string
+  }>
 }
 
 async function getCategories() {
@@ -15,20 +23,122 @@ async function getCategories() {
   })
 }
 
-async function getProducts(params: { category?: string; featured?: string; sort?: string }) {
-  const { category, featured, sort = 'display' } = params
+function parseMultiValue(value?: string) {
+  if (!value) return []
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+}
+
+function buildPriceFilter(priceRanges: string[]) {
+  if (!priceRanges.length) return undefined
+
+  const ranges = priceRanges
+    .map((range) => {
+      if (range === '0-250') {
+        return { price: { gte: 0, lte: 250 } }
+      }
+      if (range === '250-500') {
+        return { price: { gt: 250, lte: 500 } }
+      }
+      if (range === '500-1000') {
+        return { price: { gt: 500, lte: 1000 } }
+      }
+      if (range === '1000-plus') {
+        return { price: { gt: 1000 } }
+      }
+      return null
+    })
+    .filter(Boolean)
+
+  return ranges.length ? ranges : undefined
+}
+
+async function getProducts(params: {
+  category?: string
+  categories?: string
+  gender?: string
+  price?: string
+  featured?: string
+  discounted?: string
+  sort?: string
+}) {
+  const {
+    category,
+    categories,
+    gender,
+    price,
+    featured,
+    discounted,
+    sort = 'display',
+  } = params
 
   const orderBy: Record<string, string>[] = []
   if (sort === 'newest') orderBy.push({ createdAt: 'desc' })
   else if (sort === 'price-asc') orderBy.push({ price: 'asc' })
   else if (sort === 'price-desc') orderBy.push({ price: 'desc' })
+  else if (sort === 'name-asc') orderBy.push({ name: 'asc' })
+  else if (sort === 'name-desc') orderBy.push({ name: 'desc' })
   else orderBy.push({ displayOrder: 'asc' })
+
+  const categoryValues = parseMultiValue(categories)
+  const genderValues = parseMultiValue(gender)
+  const priceValues = parseMultiValue(price)
+
+  const andFilters: any[] = [{ isActive: true }]
+
+  if (category) {
+    andFilters.push({
+      category: { slug: category },
+    })
+  }
+
+  if (categoryValues.length) {
+    andFilters.push({
+      category: {
+        slug: { in: categoryValues },
+      },
+    })
+  }
+
+  if (featured === 'true') {
+    andFilters.push({
+      isFeatured: true,
+    })
+  }
+
+  if (discounted === 'true') {
+    andFilters.push({
+      discountPrice: {
+        not: null,
+      },
+    })
+  }
+
+  if (genderValues.length) {
+    const genderConditions = genderValues.map((value) => ({
+      OR: [
+        { name: { contains: value } },
+        { description: { contains: value } },
+      ],
+    }))
+
+    andFilters.push({
+      OR: genderConditions,
+    })
+  }
+
+  const priceFilter = buildPriceFilter(priceValues)
+  if (priceFilter) {
+    andFilters.push({
+      OR: priceFilter,
+    })
+  }
 
   return prisma.product.findMany({
     where: {
-      isActive: true,
-      ...(category ? { category: { slug: category } } : {}),
-      ...(featured === 'true' ? { isFeatured: true } : {}),
+      AND: andFilters,
     },
     include: {
       category: { select: { id: true, name: true, slug: true } },
