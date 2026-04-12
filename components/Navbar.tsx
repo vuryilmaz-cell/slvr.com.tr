@@ -73,7 +73,7 @@ export default function Navbar() {
         }}
       >
         <nav className="container mx-auto px-5 sm:px-8">
-          <div className="flex items-center justify-between h-[68px] sm:h-[76px]">
+          <div className="flex items-center justify-between h-[100px] sm:h-[76px]">
 
             {/* Sol — logo */}
             <Link

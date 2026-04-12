@@ -169,66 +169,82 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            playsInline
-            preload="metadata"
-            poster="/uploads/images/anasayfa_background.jpg"
-            className="hidden md:block absolute top-0 left-0 w-full h-full"
-            style={{
-              objectFit: 'cover',
-              objectPosition: 'center',
-              transform: 'scale(1.2) scaleX(-1)',
-              minWidth: '100%',
-              minHeight: '100%',
-              filter: 'brightness(0.9)',
-            }}
-            aria-hidden="true"
-          >
-            <source src="http://localhost:3000/videos/jewelry.webm" type="video/WEBM" />
-          </video>
+<section className="relative min-h-screen flex items-center overflow-hidden">
+  <div className="absolute inset-0">
+    {/* Desktop Video */}
+    <video
+      autoPlay
+      muted
+      playsInline
+      preload="metadata"
+      poster="/uploads/images/anasayfa_background.jpg"
+      className="hidden md:block absolute top-0 left-0 w-full h-full"
+      style={{
+        objectFit: 'cover',
+        objectPosition: 'center',
+        transform: 'scale(1.2) scaleX(-1)',
+        minWidth: '100%',
+        minHeight: '100%',
+        filter: 'brightness(0.9)',
+      }}
+      aria-hidden="true"
+    >
+      <source src="/videos/jewelry.webm" type="video/webm" />
+      <source src="/videos/hero-bg.mp4" type="video/mp4" />
+    </video>
 
-          <Image
-            src="/uploads/images/anasayfa_background_3.jpg"
-            alt="Silvre lüks gümüş mücevher koleksiyonu - el yapımı 999 ayar saf gümüş takılar"
-            fill
-            className="md:hidden object-cover"
-            priority
-            quality={85}
-            sizes="100vw"
-          />
+    {/* Mobile Video */}
+    <video
+      autoPlay
+      muted
+      playsInline
+      preload="metadata"
+      poster="/uploads/images/anasayfa_background_3.jpg"
+      className="block md:hidden absolute top-0 left-0 w-full h-full"
+      style={{
+        objectFit: 'cover',
+        objectPosition: 'center',
+        minWidth: '100%',
+        minHeight: '100%',
+        filter: 'brightness(0.5)',
+      }}
+      aria-hidden="true"
+    >
+      <source src="/videos/jewelry-mobile.mp4" type="video/mp4" />
+    </video>
 
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
-        </div>
 
-        <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-24 sm:pt-32">
-          <div className="max-w-xl lg:max-w-2xl hero-content">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide">
-              Zarif ve Şık
-            </h1>
+    {/* Video Etiketi Buraya Gelecek */}
 
-            <div className="space-y-3 mb-10">
-              <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
-                
-              Size özel ve el işçiliğiyle hazırlanan özel tasarımlar.
-              </p>
-            </div>
 
-            <div>
-              <Link
-                href="/products"
-                className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
-                aria-label="Silvre 999 ayar saf gümüş takı koleksiyonunu keşfedin"
-              >
-                KOLEKSİYONU KEŞFET
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+
+    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+  </div>
+
+  <div className="container mx-auto px-10 sm:px-6 relative z-10 pt-24 sm:pt-32">
+  <div className="max-w-xl lg:max-w-2xl hero-content text-center md:text-left mx-auto md:mx-0">
+  <h1 className="text-6xl sm:text-6xl md:text-6xl lg:text-6xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide text-center md:text-left">
+    Zarif ve Şık
+      </h1>
+
+      <div className="space-y-3 mb-10">
+      <p className="text-xl sm:text-lg md:text-xl text-white/95 font-light leading-relaxed text-center md:text-left">
+          Size özel ve el işçiliğiyle hazırlanan özel tasarımlar.
+        </p>
+      </div>
+
+      <div>
+        <Link
+          href="/products"
+          className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
+          aria-label="Silvre 999 ayar saf gümüş takı koleksiyonunu keşfedin"
+        >
+          KOLEKSİYONU KEŞFET
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
 
       <section className="section section-gray" aria-labelledby="categories-heading">
         <div className="container mx-auto px-4">
