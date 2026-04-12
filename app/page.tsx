@@ -188,7 +188,7 @@ export default async function HomePage() {
             }}
             aria-hidden="true"
           >
-            <source src="http://localhost:3000/videos/jewelry.mp4" type="video/mp4" />
+            <source src="http://localhost:3000/videos/jewelry.webm" type="video/WEBM" />
           </video>
 
           <Image
