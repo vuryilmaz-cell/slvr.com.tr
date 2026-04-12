@@ -181,14 +181,14 @@ export default async function HomePage() {
             style={{
               objectFit: 'cover',
               objectPosition: 'center',
-              transform: 'scale(1.2) scaleX(1)',
+              transform: 'scale(1.2) scaleX(-1)',
               minWidth: '100%',
               minHeight: '100%',
               filter: 'brightness(0.9)',
             }}
             aria-hidden="true"
           >
-            <source src="/videos/hero-bg.mp4" type="video/mp4" />
+            <source src="http://localhost:3000/videos/jewelry.mp4" type="video/mp4" />
           </video>
 
           <Image
