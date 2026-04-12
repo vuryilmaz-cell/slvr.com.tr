@@ -1,103 +1,149 @@
-'use client'
-
-import { use, useEffect, useState } from 'react'
-import Link from 'next/link'
+import { prisma } from '@/lib/prisma'
 import Image from 'next/image'
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
+import type { Metadata } from 'next'
+import CategoryProductsClient from '@/components/CategoryProductsClient'
 
-interface Product {
-  id: number
-  name: string
-  slug: string
-  price: number
-  discountPrice: number | null
-  category: { id: number; name: string }
-  images: { imageUrl: string }[]
-}
+export const revalidate = 3600
 
-interface Category {
-  id: number
-  name: string
-  slug: string
-  description: string | null
-}
-
-export default function CategoryPage({
-  params,
-}: {
+interface Props {
   params: Promise<{ slug: string }>
-}) {
-  const { slug } = use(params)
-  const [category, setCategory] = useState<Category | null>(null)
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
-  const [currentSort, setCurrentSort] = useState('display')
+}
 
-  useEffect(() => {
-    async function fetchData() {
-      setLoading(true)
-      try {
-        const [categoryRes, productsRes] = await Promise.all([
-          fetch(`/api/categories/${slug}`),
-          fetch(`/api/products?category=${slug}&sort=${currentSort}`)
-        ])
+// ─── Data fetching ────────────────────────────────────────────────────────────
 
-        if (categoryRes.ok) {
-          const categoryData = await categoryRes.json()
-          setCategory(categoryData.category)
-        }
+async function getCategory(slug: string) {
+  return prisma.category.findUnique({
+    where: { slug, isActive: true },
+  })
+}
 
-        if (productsRes.ok) {
-          const productsData = await productsRes.json()
-          setProducts(productsData.products || [])
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
+async function getProducts(slug: string, sort = 'display') {
+  const orderBy: Record<string, string>[] = []
+  if (sort === 'newest')     orderBy.push({ createdAt: 'desc' })
+  else if (sort === 'price-asc')  orderBy.push({ price: 'asc' })
+  else if (sort === 'price-desc') orderBy.push({ price: 'desc' })
+  else                        orderBy.push({ displayOrder: 'asc' })
 
-    fetchData()
-  }, [slug, currentSort])
+  return prisma.product.findMany({
+    where: { category: { slug }, isActive: true },
+    include: {
+      category: { select: { id: true, name: true } },
+      images: { orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }] },
+    },
+    orderBy,
+  })
+}
 
-  const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrentSort(e.target.value)
+// ─── Metadata ─────────────────────────────────────────────────────────────────
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params
+  const category = await getCategory(slug)
+  if (!category) return { title: 'Kategori Bulunamadı' }
+
+  const title = `${category.name} | Silvre Lüks Gümüş Mücevher`
+  const description =
+    category.description ||
+    `Silvre'nin el yapımı ${category.name.toLowerCase()} koleksiyonu. 999 ayar saf gümüş, özel tasarım ${category.name.toLowerCase()} modelleri. Ücretsiz kargo ve kalite garantisi.`
+
+  return {
+    title,
+    description,
+    keywords: [
+      `gümüş ${category.name.toLowerCase()}`,
+      `999 ayar ${category.name.toLowerCase()}`,
+      `el yapımı ${category.name.toLowerCase()}`,
+      `lüks ${category.name.toLowerCase()}`,
+      `silvre ${category.name.toLowerCase()}`,
+      'gümüş mücevher',
+      'lüks gümüş takı',
+    ],
+    alternates: {
+      canonical: `https://slvr.com.tr/categories/${slug}`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://slvr.com.tr/categories/${slug}`,
+      siteName: 'Silvre Jewelry',
+      locale: 'tr_TR',
+      type: 'website',
+      images: category.imageUrl
+        ? [{ url: category.imageUrl, width: 1200, height: 630, alt: title }]
+        : [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'Silvre Lüks Gümüş Mücevher' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function CategoryPage({ params }: Props) {
+  const { slug } = await params
+  const [category, products] = await Promise.all([
+    getCategory(slug),
+    getProducts(slug),
+  ])
+
+  if (!category) notFound()
+
+  // ── Structured Data ──────────────────────────────────────────────────────────
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Ana Sayfa',  item: 'https://slvr.com.tr' },
+      { '@type': 'ListItem', position: 2, name: 'Ürünler',    item: 'https://slvr.com.tr/products' },
+      { '@type': 'ListItem', position: 3, name: category.name, item: `https://slvr.com.tr/categories/${slug}` },
+    ],
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner"></div>
-      </div>
-    )
-  }
-
-  if (!category) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-serif italic mb-4">Kategori Bulunamadı</h1>
-          <Link href="/products" className="btn btn-secondary">
-            Tüm Ürünlere Dön
-          </Link>
-        </div>
-      </div>
-    )
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${category.name} - Silvre Gümüş Mücevher`,
+    description: category.description || `Silvre ${category.name} koleksiyonu`,
+    url: `https://slvr.com.tr/categories/${slug}`,
+    numberOfItems: products.length,
+    itemListElement: products.slice(0, 10).map((product, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://slvr.com.tr/products/${product.slug}`,
+      name: product.name,
+    })),
   }
 
   return (
     <>
-      {/* Hero Section */}
+      {/* ── JSON-LD ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+      />
+
+      {/* ── Hero ── */}
       <section className="bg-gradient-to-br from-[#faf8f5] to-[#f5f3f0] py-16">
         <div className="container mx-auto px-4">
-          {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+
+          {/* Breadcrumb — semantic nav ile */}
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-gray-500 mb-6">
             <Link href="/" className="hover:text-gray-900 transition-colors">Ana Sayfa</Link>
-            <span>/</span>
+            <span aria-hidden="true">/</span>
             <Link href="/products" className="hover:text-gray-900 transition-colors">Ürünler</Link>
-            <span>/</span>
-            <span className="text-gray-900">{category.name}</span>
+            <span aria-hidden="true">/</span>
+            <span className="text-gray-900" aria-current="page">{category.name}</span>
           </nav>
 
           <div className="text-center">
@@ -113,108 +159,12 @@ export default function CategoryPage({
         </div>
       </section>
 
-      {/* Products Section */}
-      <section className="section section-white">
-        <div className="container mx-auto px-4">
-          {/* Sort & Count */}
-          <div className="flex items-center justify-between mb-8 pb-6 border-b border-gray-200">
-            <p className="text-sm text-gray-600">
-              <span className="font-medium text-gray-900">{products.length}</span> ürün bulundu
-            </p>
-            <select
-              className="form-input max-w-xs text-sm"
-              value={currentSort}
-              onChange={handleSortChange}
-            >
-              <option value="display">Önerilen</option>
-              <option value="newest">En Yeni</option>
-              <option value="price-asc">Fiyat: Düşükten Yükseğe</option>
-              <option value="price-desc">Fiyat: Yüksekten Düşüğe</option>
-            </select>
-          </div>
-
-          {/* Products Grid */}
-          {products.length > 0 ? (
-            <div className="products-grid">
-              {products.map((product) => {
-                const primaryImage = product.images[0]?.imageUrl || '/placeholder.jpg'
-                const displayPrice = product.discountPrice || product.price
-
-                return (
-                  <Link
-                    key={product.slug}
-                    href={`/products/${product.slug}`}
-                    className="group card hover-lift"
-                  >
-                    <div className="aspect-square relative bg-gray-50 overflow-hidden">
-                      <Image
-                        src={primaryImage}
-                        alt={product.name}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-                      />
-                      {product.discountPrice && (
-                        <span className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 text-xs font-medium rounded uppercase tracking-wide">
-                          İndirim
-                        </span>
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
-                        {product.category.name}
-                      </p>
-                      <h3 className="font-medium text-base mb-3 line-clamp-2 text-gray-900">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-lg text-gray-900">
-                          {formatPrice(displayPrice)}
-                        </span>
-                        {product.discountPrice && (
-                          <span className="text-sm text-gray-400 line-through">
-                            {formatPrice(product.price)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <div className="mb-4">
-                <svg 
-                  className="mx-auto h-16 w-16 text-gray-300" 
-                  fill="none" 
-                  viewBox="0 0 24 24" 
-                  stroke="currentColor"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={1} 
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" 
-                  />
-                </svg>
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                Ürün Bulunamadı
-              </h3>
-              <p className="text-gray-500 mb-6">
-                Bu kategoride henüz ürün bulunmuyor.
-              </p>
-              <Link 
-                href="/products" 
-                className="btn btn-secondary inline-block"
-              >
-                Tüm Ürünleri Gör
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
+      {/* ── Products — sort interaktif olduğu için Client Component ── */}
+      <CategoryProductsClient
+        initialProducts={products}
+        categorySlug={slug}
+        categoryName={category.name}
+      />
     </>
   )
 }
