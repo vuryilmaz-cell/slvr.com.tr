@@ -170,7 +170,7 @@ export default async function HomePage() {
       />
 
 {/* Hero Section */}
-<section className="relative min-h-screen flex items-center overflow-hidden -mt-[70px]">
+<section className="relative min-h-screen flex items-center overflow-hidden">
   {/* Background Container */}
   <div className="absolute inset-0">
     {/* Desktop: Video */}
@@ -242,41 +242,8 @@ export default async function HomePage() {
 </section>
 
 
-   {/* Featured Products */}
-<section className="section section-white" aria-labelledby="featured-heading">
-  <div className="container mx-auto px-4">
-    <h2 id="featured-heading" className="section-title">Öne Çıkan Lüks Gümüş Koleksiyon</h2>
-    <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
-
-          <div className="products-grid">
-            {featuredProducts.map((product) => {
-              const primaryImage = product.images[0]?.imageUrl || '/placeholder.jpg'
-              const displayPrice = product.discountPrice || product.price
-
-              return (
-                <LuxuryProductCard
-                  key={product.id}
-                  product={{
-                    id: product.id,
-                    name: product.name,
-                    slug: product.slug,
-                    category: product.category.name,
-                    price: product.price,
-                    discountPrice: product.discountPrice,
-                    image: primaryImage,
-                    rating: 4.8,
-                    reviewCount: 124,
-                    isPremium: product.isFeatured || false
-                  }}
-                />
-              )
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Categories Section */}
-      <section className="section section-gray" aria-labelledby="categories-heading">
+{/* Categories Section */}
+<section className="section section-gray" aria-labelledby="categories-heading">
         <div className="container mx-auto px-4">
           <h2 id="categories-heading" className="section-title">Saf Gümüş Takı Koleksiyonları</h2>
           <p className="section-subtitle">Her tarza uygun özel tasarım 999 ayar saf gümüş mücevherler</p>
@@ -317,6 +284,42 @@ export default async function HomePage() {
           </nav>
         </div>
       </section>
+
+
+   {/* Featured Products */}
+<section className="section section-white" aria-labelledby="featured-heading">
+  <div className="container mx-auto px-4">
+    <h2 id="featured-heading" className="section-title">Öne Çıkan Lüks Gümüş Koleksiyon</h2>
+    <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
+
+          <div className="products-grid">
+            {featuredProducts.map((product) => {
+              const primaryImage = product.images[0]?.imageUrl || '/placeholder.jpg'
+              const displayPrice = product.discountPrice || product.price
+
+              return (
+                <LuxuryProductCard
+                  key={product.id}
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    slug: product.slug,
+                    category: product.category.name,
+                    price: product.price,
+                    discountPrice: product.discountPrice,
+                    image: primaryImage,
+                    rating: 4.8,
+                    reviewCount: 124,
+                    isPremium: product.isFeatured || false
+                  }}
+                />
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      
 
       {/* 999 Ayar Farkı - YENİ BÖLÜM */}
       <section className="section section-white bg-gradient-to-br from-gray-50 to-white">
