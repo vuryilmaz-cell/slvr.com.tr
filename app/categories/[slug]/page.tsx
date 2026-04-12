@@ -38,8 +38,29 @@ async function getProducts(slug: string, sort = 'display') {
   })
 }
 
-function getCategoryBannerPath(slug: string) {
-  return `/uploads/categories/${slug}.jpeg`
+async function resolveCategoryBannerPath(slug: string) {
+  const candidates = [
+    `/uploads/categories/${slug}.jpg`,
+    `/uploads/categories/${slug}.jpeg`,
+    `/uploads/categories/${slug}.png`,
+  ]
+
+  for (const path of candidates) {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}${path}`, {
+        method: 'HEAD',
+        cache: 'no-store',
+      })
+
+      if (response.ok) {
+        return path
+      }
+    } catch {
+      // sessiz geç
+    }
+  }
+
+  return '/uploads/categories/default-banner.jpg'
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -53,7 +74,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     category.description ||
     `Silvre'nin el yapımı ${category.name.toLowerCase()} koleksiyonu. 999 ayar saf gümüş, özel tasarım ${category.name.toLowerCase()} modelleri. Ücretsiz kargo ve kalite garantisi.`
 
-  const bannerImage = getCategoryBannerPath(slug)
+  const bannerImage = await resolveCategoryBannerPath(slug)
 
   return {
     title,
@@ -99,14 +120,13 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const { slug } = await params
   const { sort = 'display' } = await searchParams
 
-  const [category, products] = await Promise.all([
+  const [category, products, bannerImage] = await Promise.all([
     getCategory(slug),
     getProducts(slug, sort),
+    resolveCategoryBannerPath(slug),
   ])
 
   if (!category) notFound()
-
-  const bannerImage = getCategoryBannerPath(slug)
 
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
