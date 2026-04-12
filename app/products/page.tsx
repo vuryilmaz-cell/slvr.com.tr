@@ -31,7 +31,7 @@ async function getProducts(params: { category?: string; featured?: string; sort?
       ...(featured === 'true' ? { isFeatured: true } : {}),
     },
     include: {
-      category: { select: { id: true, name: true } },
+      category: { select: { id: true, name: true, slug: true } },
       images: { orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }] },
     },
     orderBy,
@@ -44,7 +44,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
   if (category) {
     const cat = await prisma.category.findUnique({ where: { slug: category } })
+
     if (cat) {
+      const canonicalUrl = `https://slvr.com.tr/categories/${category}`
       const title = `${cat.name} Koleksiyonu | Silvre Lüks Gümüş Mücevher`
       const description = `Silvre'nin el yapımı 999 ayar saf gümüş ${cat.name.toLowerCase()} koleksiyonu. Özel tasarım, kalite garantili lüks mücevher modelleri.`
 
@@ -59,12 +61,12 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
           'silvre',
         ],
         alternates: {
-          canonical: `https://slvr.com.tr/categories/${category}`,
+          canonical: canonicalUrl,
         },
         openGraph: {
           title,
           description,
-          url: `https://slvr.com.tr/categories/${category}`,
+          url: canonicalUrl,
           siteName: 'Silvre Jewelry',
           locale: 'tr_TR',
           type: 'website',
