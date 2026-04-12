@@ -8,7 +8,7 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Public paths
-  const publicPaths = ['/', '/products', '/categories', '/login', '/register', '/cart', '/checkout', '/order-success', '/orders', '/profile', '/addresses', '/admin']
+  const publicPaths = ['/', '/products', '/categories', '/login', '/register', '/cart', '/checkout', '/order-success', '/orders', '/profile', '/shipping', '/faq', '/returns', '/about', '/contact', '/privacy', '/terms', '/addresses', '/admin']
   const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(`${path}/`))
 
   if (isPublicPath) {
