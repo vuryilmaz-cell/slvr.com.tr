@@ -362,23 +362,8 @@ export default function ProductsClient({
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-10">
           <aside className="lg:sticky lg:top-24 self-start">
-            <FilterSection title="Cinsiyet">
-              <div className="space-y-3">
-                {GENDER_OPTIONS.map((option) => (
-                  <label key={option.value} className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedGenders.includes(option.value)}
-                      onChange={() => handleGenderToggle(option.value)}
-                      className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
-                    />
-                    <span>{option.label}</span>
-                  </label>
-                ))}
-              </div>
-            </FilterSection>
-
-            <FilterSection title="Kategoriler">
+            
+          <FilterSection title="Kategoriler">
               <div className="space-y-3">
                 {categories.map((category) => {
                   const checked =
@@ -398,6 +383,25 @@ export default function ProductsClient({
                 })}
               </div>
             </FilterSection>
+
+            
+            <FilterSection title="Cinsiyet">
+              <div className="space-y-3">
+                {GENDER_OPTIONS.map((option) => (
+                  <label key={option.value} className="flex items-center gap-3 text-sm text-gray-600 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedGenders.includes(option.value)}
+                      onChange={() => handleGenderToggle(option.value)}
+                      className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </FilterSection>
+
+
 
             <FilterSection title="Fiyat Aralığı">
               <div className="space-y-3">
@@ -440,32 +444,7 @@ export default function ProductsClient({
           </aside>
 
           <div>
-            <nav aria-label="Kategori hızlı filtreleri" className="flex flex-wrap gap-3 mb-8 justify-center lg:justify-start">
-              <button
-                onClick={() => handleMainCategoryChange('')}
-                className={`px-5 py-2.5 rounded border text-sm font-medium uppercase tracking-wide transition-all ${
-                  !activeCategory
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-black hover:bg-gray-50'
-                }`}
-              >
-                Tümü
-              </button>
-
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => handleMainCategoryChange(category.slug)}
-                  className={`px-5 py-2.5 rounded border text-sm font-medium uppercase tracking-wide transition-all ${
-                    activeCategory === category.slug
-                      ? 'bg-black text-white border-black'
-                      : 'bg-white text-gray-700 border-gray-300 hover:border-black hover:bg-gray-50'
-                  }`}
-                >
-                  {category.name}
-                </button>
-              ))}
-            </nav>
+            
 
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-6 border-b border-gray-200">
               <p className="text-sm text-gray-600">
