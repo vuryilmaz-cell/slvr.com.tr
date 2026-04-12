@@ -1,59 +1,69 @@
 import { prisma } from '@/lib/prisma'
 import Image from 'next/image'
 import Link from 'next/link'
+import { formatPrice } from '@/lib/utils'
 import type { Metadata } from 'next'
 
+// YENİ COMPONENTS
 import LuxuryProductCard from '@/components/LuxuryProductCard'
 import InstagramFeed from '@/components/InstagramFeed'
 import TestimonialsSlider from '@/components/TestimonialsSlider'
 
-export const revalidate = 3600
+// Server Component - SEO için kritik
+export const revalidate = 3600 // 1 saat cache
 
-const SITE_URL = 'https://slvr.com.tr'
-const HERO_IMAGE = `${SITE_URL}/uploads/images/anasayfa_background_3.jpg`
-
+// SEO Metadata - 999 AYAR
 export const metadata: Metadata = {
   title: 'Silvre - Lüks Gümüş Mücevher | 999 Ayar Saf Gümüş El Yapımı Takılar',
-  description:
-    'Silvre, 999 ayar saf gümüşten üretilen el yapımı ve kişiye özel takılar sunan lüks gümüş mücevher markasıdır.',
+  description: 'Türkiye\'nin en prestijli lüks gümüş mücevher markası. %100 el işçiliği, kişiye özel 999 ayar saf gümüş takı koleksiyonu. %99.9 saflıkta fine silver kolye, küpe, yüzük, bileklik modelleri.',
   keywords: [
-    'Silvre',
     'lüks gümüş mücevher',
+    'premium gümüş takı',
+    '999 ayar gümüş',
     '999 ayar saf gümüş',
-    'el yapımı gümüş takı',
-    'kişiye özel gümüş takı',
     'fine silver',
+    'el yapımı gümüş takı',
+    'özel tasarım gümüş',
+    'butik mücevher',
+    'silvre',
+    'saf gümüş kolye',
+    'saf gümüş küpe',
+    'saf gümüş yüzük',
+    'saf gümüş bileklik',
+    '999 ayar kolye',
+    '999 ayar küpe',
+    'sterling gümüş'
   ],
   openGraph: {
     title: 'Silvre - Lüks Gümüş Mücevher | El Yapımı 999 Ayar Saf Gümüş Takılar',
-    description:
-      'Kişiye özel, el yapımı ve 999 ayar saf gümüşten üretilen zarif takıları keşfedin.',
+    description: 'Kişiye özel %100 el işçiliği lüks gümüş takılar. 999 ayar (%99.9 saf) fine silver ile üretilen zarif ve prestijli tasarımlar.',
     type: 'website',
     locale: 'tr_TR',
-    url: SITE_URL,
+    url: 'https://slvr.com.tr',
     siteName: 'Silvre',
     images: [
       {
-        url: HERO_IMAGE,
+        url: '/uploads/images/anasayfa_background_3.jpg',
         width: 1200,
         height: 630,
-        alt: 'Silvre lüks gümüş mücevher koleksiyonu',
+        alt: 'Silvre Lüks Gümüş Mücevher Koleksiyonu - 999 Ayar Saf Gümüş',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Silvre - 999 Ayar Saf Gümüş Mücevher',
-    description: 'El yapımı ve kişiye özel 999 ayar saf gümüş takılar.',
-    images: [HERO_IMAGE],
+    description: 'Kişiye özel %100 el işçiliği lüks 999 ayar saf gümüş takılar',
+    images: ['/uploads/images/anasayfa_background_3.jpg'],
   },
   alternates: {
-    canonical: SITE_URL,
+    canonical: 'https://slvr.com.tr',
   },
 }
 
+// Server-side data fetching
 async function getFeaturedProducts() {
-  return prisma.product.findMany({
+  return await prisma.product.findMany({
     where: {
       isFeatured: true,
       isActive: true,
@@ -61,71 +71,67 @@ async function getFeaturedProducts() {
     include: {
       category: true,
       images: {
-        orderBy: [{ isPrimary: 'desc' }, { displayOrder: 'asc' }],
+        orderBy: [
+          { isPrimary: 'desc' },
+          { displayOrder: 'asc' }
+        ]
       },
     },
     take: 8,
     orderBy: {
-      displayOrder: 'asc',
-    },
+      displayOrder: 'asc'
+    }
   })
 }
 
 async function getCategories() {
-  return prisma.category.findMany({
+  return await prisma.category.findMany({
     where: { isActive: true },
-    orderBy: { displayOrder: 'asc' },
+    orderBy: { displayOrder: 'asc' }
   })
 }
 
-function toAbsoluteUrl(path?: string | null) {
-  if (!path) return undefined
-  if (path.startsWith('http://') || path.startsWith('https://')) return path
-  return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`
-}
-
 export default async function HomePage() {
-  let featuredProducts = [] as Awaited<ReturnType<typeof getFeaturedProducts>>
-  let categories = [] as Awaited<ReturnType<typeof getCategories>>
+  const [featuredProducts, categories] = await Promise.all([
+    getFeaturedProducts(),
+    getCategories()
+  ])
 
-  try {
-    ;[featuredProducts, categories] = await Promise.all([
-      getFeaturedProducts(),
-      getCategories(),
-    ])
-  } catch (error) {
-    console.error('Homepage data fetch failed:', error)
-  }
-
+  // Structured Data - Organization
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Silvre',
     alternateName: 'Silvre Jewelry',
-    url: SITE_URL,
-    logo: `${SITE_URL}/uploads/images/silvre.jewelry-logo-black.png`,
-    description:
-      'El yapımı ve kişiye özel 999 ayar saf gümüş takılar sunan lüks gümüş mücevher markası.',
+    url: 'https://slvr.com.tr',
+    logo: 'https://slvr.com.tr/uploads/images/silvre.jewelry-logo-black.png',
+    description: 'Lüks gümüş mücevher ve el yapımı 999 ayar saf gümüş takı koleksiyonu. %99.9 saflıkta fine silver.',
     address: {
       '@type': 'PostalAddress',
       addressCountry: 'TR',
       addressLocality: 'İstanbul',
     },
-    sameAs: ['https://instagram.com/silvre.jewelry'],
+    sameAs: [
+      'https://instagram.com/silvre.jewelry',
+      'https://facebook.com/silvre.jewelry',
+      'https://twitter.com/silvre.jewelry',
+    ],
   }
 
+  // Structured Data - WebSite
   const websiteSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Silvre',
-    url: SITE_URL,
+    url: 'https://slvr.com.tr',
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${SITE_URL}/products?search={search_term_string}`,
+      target: 'https://slvr.com.tr/products?search={search_term_string}',
       'query-input': 'required name=search_term_string',
     },
   }
 
+  // Structured Data - ItemList (Products)
   const itemListSchema = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -135,20 +141,13 @@ export default async function HomePage() {
       item: {
         '@type': 'Product',
         name: product.name,
-        url: `${SITE_URL}/products/${product.slug}`,
-        image: toAbsoluteUrl(product.images[0]?.imageUrl),
+        url: `https://slvr.com.tr/products/${product.slug}`,
+        image: product.images[0]?.imageUrl,
         material: '999 Ayar Saf Gümüş',
-        brand: {
-          '@type': 'Brand',
-          name: 'Silvre',
-        },
         offers: {
           '@type': 'Offer',
-          url: `${SITE_URL}/products/${product.slug}`,
           price: product.discountPrice || product.price,
           priceCurrency: 'TRY',
-          availability: 'https://schema.org/InStock',
-          itemCondition: 'https://schema.org/NewCondition',
         },
       },
     })),
@@ -156,6 +155,7 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
@@ -169,75 +169,84 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
       />
 
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <video
-            autoPlay
-            muted
-            playsInline
-            preload="metadata"
-            poster="/uploads/images/anasayfa_background.jpg"
-            className="hidden md:block absolute top-0 left-0 w-full h-full"
-            style={{
-              objectFit: 'cover',
-              objectPosition: 'center',
-              transform: 'scale(1.2) scaleX(1)',
-              minWidth: '100%',
-              minHeight: '100%',
-              filter: 'brightness(0.9)',
-            }}
-            aria-hidden="true"
-          >
-            <source src="/videos/hero-bg.mp4" type="video/mp4" />
-          </video>
+{/* Hero Section */}
+<section className="relative min-h-screen flex items-center overflow-hidden">
+  {/* Background Container */}
+  <div className="absolute inset-0">
+    {/* Desktop: Video */}
+    <video
+  autoPlay
+  muted
+  playsInline
+  poster="/uploads/images/anasayfa_background.jpg"
+  className="hidden md:block absolute top-0 left-0 w-full h-full"
+  style={{
+    objectFit: 'cover',
+    objectPosition: 'center',
+    transform: 'scale(1.2) scaleX(1)' ,  /* %20 büyüt, siyah bandları gizle */
+    minWidth: '100%',
+    minHeight: '100%',
+    filter: 'brightness(1)'  /* %80 parlaklık = daha koyu */
+  }}
+>
+  <source src="/videos/hero-bg.mp4" type="video/mp4" />
+</video>
+    
+    {/* Mobile: Image */}
+    <Image
+      src="/uploads/images/anasayfa_background_3.jpg"
+      alt="Silvre lüks gümüş mücevher koleksiyonu - El yapımı 999 ayar saf gümüş takılar"
+      fill
+      className="md:hidden object-cover"
+      priority
+      quality={85}
+      sizes="100vw"
+    />
+    
+    {/* Gradient Overlay */}
+    <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
+  </div>
 
-          <Image
-            src="/uploads/images/anasayfa_background_3.jpg"
-            alt="Silvre lüks gümüş mücevher koleksiyonu - el yapımı 999 ayar saf gümüş takılar"
-            fill
-            className="md:hidden object-cover"
-            priority
-            quality={85}
-            sizes="100vw"
-          />
+  {/* Hero Content */}
+  <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-24 sm:pt-32">
+    <div className="max-w-xl lg:max-w-2xl hero-content">
+      <h1 className="sr-only">
+        Silvre - Lüks Gümüş Mücevher | Kişiye Özel El Yapımı 999 Ayar Saf Gümüş Takılar
+      </h1>
+      
+      <div 
+        className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide" 
+        aria-hidden="true"
+      >
+        Zarif & Lüks
+      </div>
+      
+      <div className="space-y-3 mb-10">
+        <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
+          Gümüşle gelen şıklığın en yeni yorumu.
+          <br/>Kişiye özel %100 el işçiliği gümüş takılar.
+        </p>
+      </div>
 
-          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
-        </div>
+      <div>
+        <Link 
+          href="/products" 
+          className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
+          aria-label="Silvre 999 ayar saf gümüş takı koleksiyonunu keşfedin"
+        >
+          KOLEKSİYONU KEŞFET
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div className="container mx-auto px-4 sm:px-6 relative z-10 pt-24 sm:pt-32">
-          <div className="max-w-xl lg:max-w-2xl hero-content">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-6xl font-serif font-light italic text-white mb-8 leading-tight tracking-wide">
-              Zarif ve Şık
-            </h1>
 
-            <div className="space-y-3 mb-10">
-              <p className="text-base sm:text-lg md:text-xl text-white/95 font-light leading-relaxed">
-                
-              Size özel ve el işçiliğiyle hazırlanan özel tasarımlar.
-              </p>
-            </div>
-
-            <div>
-              <Link
-                href="/products"
-                className="inline-block bg-white/10 backdrop-blur-sm border border-white/30 text-white px-10 py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-black transition-all duration-500 shadow-lg hover:shadow-2xl hover:border-white"
-                aria-label="Silvre 999 ayar saf gümüş takı koleksiyonunu keşfedin"
-              >
-                KOLEKSİYONU KEŞFET
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section section-gray" aria-labelledby="categories-heading">
+{/* Categories Section */}
+<section className="section section-gray" aria-labelledby="categories-heading">
         <div className="container mx-auto px-4">
-          <h2 id="categories-heading" className="section-title">
-            Saf Gümüş Takı Koleksiyonları
-          </h2>
-          <p className="section-subtitle">
-            Her tarza uygun özel tasarım 999 ayar saf gümüş mücevherler
-          </p>
+          <h2 id="categories-heading" className="section-title">Saf Gümüş Takı Koleksiyonları</h2>
+          <p className="section-subtitle">Her tarza uygun özel tasarım 999 ayar saf gümüş mücevherler</p>
 
           <nav aria-label="Ürün kategorileri">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -252,16 +261,14 @@ export default async function HomePage() {
                     {category.imageUrl ? (
                       <Image
                         src={category.imageUrl}
-                        alt={`${category.name} - 999 ayar saf gümüş koleksiyonu`}
+                        alt={`${category.name} - 999 ayar saf gümüş ${category.name.toLowerCase()} koleksiyonu`}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                        <span className="text-4xl text-gray-400" aria-hidden="true">
-                          📿
-                        </span>
+                        <span className="text-4xl text-gray-400" aria-hidden="true">📿</span>
                       </div>
                     )}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -278,16 +285,17 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="section section-white" aria-labelledby="featured-heading">
-        <div className="container mx-auto px-4">
-          <h2 id="featured-heading" className="section-title">
-            Öne Çıkan Lüks Gümüş Koleksiyon
-          </h2>
-          <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
+
+   {/* Featured Products */}
+<section className="section section-white" aria-labelledby="featured-heading">
+  <div className="container mx-auto px-4">
+    <h2 id="featured-heading" className="section-title">Öne Çıkan Lüks Gümüş Koleksiyon</h2>
+    <p className="section-subtitle">El yapımı, 999 ayar saf gümüş özel tasarım takılar</p>
 
           <div className="products-grid">
             {featuredProducts.map((product) => {
               const primaryImage = product.images[0]?.imageUrl || '/placeholder.jpg'
+              const displayPrice = product.discountPrice || product.price
 
               return (
                 <LuxuryProductCard
@@ -300,7 +308,9 @@ export default async function HomePage() {
                     price: product.price,
                     discountPrice: product.discountPrice,
                     image: primaryImage,
-                    isPremium: product.isFeatured || false,
+                    rating: 4.8,
+                    reviewCount: 124,
+                    isPremium: product.isFeatured || false
                   }}
                 />
               )
@@ -309,6 +319,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      
+
+      {/* 999 Ayar Farkı - YENİ BÖLÜM */}
       <section className="section section-white bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
@@ -316,35 +329,39 @@ export default async function HomePage() {
               999 Ayar Saf Gümüş Farkı
             </h2>
             <p className="text-lg text-gray-600 mb-8">
-              %99.9 saflık oranına sahip gümüş ile özenli işçilik ve seçkin tasarım anlayışı.
+              %99.9 saflıkta gümüş ile en yüksek kalite standardı
             </p>
-
+            
             <div className="grid md:grid-cols-2 gap-8 mt-8">
               <div className="p-8 bg-white rounded-lg shadow-md border-2 border-gold-accent">
                 <div className="text-4xl mb-4">✨</div>
-                <h3 className="text-2xl font-semibold mb-3 text-gray-800">999 Ayar (Fine Silver)</h3>
+                <h3 className="text-2xl font-semibold mb-3 text-gray-800">
+                  999 Ayar (Fine Silver)
+                </h3>
                 <div className="text-3xl font-bold text-gold-accent mb-3">%99.9</div>
                 <p className="text-gray-600 mb-4 font-medium">Saf Gümüş - Silvre Standardı</p>
                 <ul className="text-left text-sm text-gray-600 space-y-2">
-                  <li>✓ Yüksek saflık oranı</li>
-                  <li>✓ Hassas ciltler için uygun kullanım</li>
-                  <li>✓ Parlak ve zarif görünüm</li>
-                  <li>✓ Seçkin koleksiyon anlayışı</li>
-                  <li>✓ Özel üretim yaklaşımı</li>
+                  <li>✓ En yüksek saflık</li>
+                  <li>✓ Hipoalerjenik</li>
+                  <li>✓ Doğal parlak görünüm</li>
+                  <li>✓ Prestijli ve nadir</li>
+                  <li>✓ Daha yüksek değer</li>
                 </ul>
               </div>
-
+              
               <div className="p-8 bg-gray-50 rounded-lg border border-gray-200">
                 <div className="text-4xl mb-4 opacity-50">⭐</div>
-                <h3 className="text-2xl font-semibold mb-3 text-gray-600">925 Ayar (Sterling Silver)</h3>
+                <h3 className="text-2xl font-semibold mb-3 text-gray-600">
+                  925 Ayar (Sterling Silver)
+                </h3>
                 <div className="text-3xl font-bold text-gray-500 mb-3">%92.5</div>
-                <p className="text-gray-500 mb-4">Gümüş ve alaşım içeren yaygın kullanım standardı</p>
+                <p className="text-gray-500 mb-4">Gümüş + %7.5 Alaşım</p>
                 <ul className="text-left text-sm text-gray-400 space-y-2">
-                  <li>• Yaygın kullanılan gümüş standardı</li>
-                  <li>• Alaşım içeren yapı</li>
-                  <li>• Farklı tasarım ve üretim tercihleri</li>
-                  <li>• Geniş ürün çeşitliliği</li>
-                  <li>• Kullanım amacına göre farklı avantajlar</li>
+                  <li>• Standart kalite</li>
+                  <li>• Diğer metallerle karışık</li>
+                  <li>• Daha mat görünüm</li>
+                  <li>• Yaygın kullanım</li>
+                  <li>• Düşük değer</li>
                 </ul>
               </div>
             </div>
@@ -352,12 +369,14 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* YENİ: Müşteri Yorumları */}
       <TestimonialsSlider />
 
+      {/* Why Choose Us */}
       <section className="section section-white" aria-labelledby="features-heading">
         <div className="container mx-auto px-4">
           <h2 id="features-heading" className="section-title">Neden Silvre Lüks Gümüş Mücevher?</h2>
-
+          
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <article className="text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4" aria-hidden="true">
@@ -367,7 +386,7 @@ export default async function HomePage() {
               </div>
               <h3 className="font-serif text-xl mb-3">%100 El İşçiliği</h3>
               <p className="text-gray-600 leading-relaxed">
-                Her parça, deneyimli ustalarımız tarafından özenle üretilir. Geleneksel el işçiliği teknikleriyle modern tasarımı bir araya getiriyoruz.
+                Her parça, deneyimli ustalarımız tarafından özenle üretilir. Geleneksel el işçiliği teknikleriyle modern tasarımı birleştiriyoruz.
               </p>
             </article>
 
@@ -379,7 +398,8 @@ export default async function HomePage() {
               </div>
               <h3 className="font-serif text-xl mb-3">999 Ayar Saf Gümüş</h3>
               <p className="text-gray-600 leading-relaxed">
-                %99.9 saflıkta, sertifikalı 999 ayar saf gümüş kullanıyoruz. Her ürün, özenli üretim ve kalite yaklaşımıyla hazırlanır.
+                %99.9 saflıkta, sertifikalı 999 ayar saf gümüş (fine silver) kullanıyoruz. 
+                En yüksek kalite standardı ile her ürün kalite garantisi ile gelir.
               </p>
             </article>
 
@@ -391,29 +411,44 @@ export default async function HomePage() {
               </div>
               <h3 className="font-serif text-xl mb-3">Kişiye Özel Tasarım</h3>
               <p className="text-gray-600 leading-relaxed">
-                Kişiye özel tasarım ve üretim hizmeti sunuyoruz. Hayalinizdeki mücevheri birlikte tasarlayıp sizin için özel hale getiriyoruz.
+                Kişiye özel tasarım ve üretim hizmeti sunuyoruz. 999 ayar saf gümüş ile 
+                hayalinizdeki mücevheri birlikte tasarlayalım.
               </p>
             </article>
           </div>
         </div>
       </section>
 
+      {/* YENİ: Instagram Feed */}
       <InstagramFeed />
 
+      {/* SEO Text Content - 999 AYAR VURGUSU */}
       <section className="section section-white bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">
           <article className="prose prose-lg mx-auto">
             <h2 className="text-3xl font-serif font-light text-center mb-6">
-              Silvre ile Zarafeti Keşfedin
+              Lüks Gümüş Mücevher - Silvre ile Zarafeti Keşfedin
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              <strong>Silvre</strong>, el işçiliğiyle üretilen ve seçkin tasarım anlayışını yansıtan gümüş mücevher koleksiyonları sunar. 999 ayar saf gümüş kullanılarak hazırlanan parçalar, sade çizgilerle güçlü bir zarafet anlayışını bir araya getirir.
+              <strong>Silvre</strong>, Türkiye'nin en prestijli lüks gümüş mücevher markasıdır. 
+              %100 el işçiliği ile üretilen <strong>999 ayar saf gümüş takılar</strong>ımız, 
+              modern minimalizm ile klasik zarafetin mükemmel birleşimini sunar. 
+              <strong>%99.9 saflıkta gümüş</strong> (fine silver) kullanarak, her bir parçayı 
+              deneyimli ustalarımız tarafından özenle tasarlıyor ve üretiyoruz.
             </p>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Koleksiyonumuzda kolye, küpe, yüzük ve bileklik gibi farklı takı grupları yer alır. Her parça, günlük kullanımdan özel anlara kadar farklı stillere eşlik edecek şekilde özenle hazırlanır.
+              Koleksiyonumuzda <strong>999 ayar saf gümüş kolye</strong>, 
+              <strong>999 ayar saf gümüş küpe</strong>, <strong>999 ayar saf gümüş yüzük</strong> 
+              ve <strong>999 ayar saf gümüş bileklik</strong> modelleri bulunmaktadır. 
+              Kişiye özel tasarım hizmetimiz ile hayalinizdeki mücevheri gerçeğe dönüştürüyoruz.
             </p>
             <p className="text-gray-700 leading-relaxed">
-              Kişiye özel üretim yaklaşımımız sayesinde, yalnızca estetik değil anlam taşıyan tasarımlar da sunuyoruz. Silvre, saf gümüşün zarafetini modern ve zamansız bir yorumla buluşturur.
+              <strong>999 ayar saf gümüş takı</strong> arayanlar için ideal olan Silvre, 
+              butik üretim anlayışı ile her müşterisine özel deneyim sunmaktadır. 
+              Sertifikalı <strong>fine silver (999 ayar)</strong> malzeme, kalite garantisi 
+              ve üstün işçilik ile lüks mücevher dünyasında fark yaratıyoruz. Sterling silver 
+              (%92.5) yerine %99.9 saflıkta gümüş kullanarak, size en yüksek kalite ve 
+              değeri sunuyoruz.
             </p>
           </article>
         </div>
