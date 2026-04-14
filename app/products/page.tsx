@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import type { Metadata } from 'next'
 import ProductsClient from '@/components/ProductsClient'
+import { useEffect } from 'react'
+import Head from 'next/head'
 
 export const revalidate = 3600
 
@@ -90,7 +92,9 @@ async function getProducts(params: {
 
   if (category) {
     andFilters.push({
-      category: { slug: category },
+      category: {
+        slug: category,
+      },
     })
   }
 
