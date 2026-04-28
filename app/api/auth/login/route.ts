@@ -8,7 +8,7 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Şifre gerekli'),
 })
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     

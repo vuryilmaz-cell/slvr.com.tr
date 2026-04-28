@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getUserFromToken } from '@/lib/auth'
 
 // GET /api/admin/users - Get all users (Admin only)
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     // Check authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')

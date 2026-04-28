@@ -4,7 +4,7 @@ import { writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     // Check authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')

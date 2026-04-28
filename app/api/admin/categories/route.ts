@@ -11,7 +11,7 @@ const categorySchema = z.object({
 })
 
 // GET /api/admin/categories - Get all categories with product count
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/admin/categories - Create new category
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null

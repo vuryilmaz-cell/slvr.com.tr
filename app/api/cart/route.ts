@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getUserFromToken } from '@/lib/auth'
 
 // GET /api/cart - Get user's cart
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
                   request.cookies.get('token')?.value
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/cart - Add item to cart
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     console.log('🔥 POST /api/cart çağrıldı')
     

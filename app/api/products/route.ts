@@ -58,7 +58,7 @@ function buildPriceFilter(priceRanges: string[]) {
 }
 
 // GET /api/products - List products with filters
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
 
@@ -190,7 +190,7 @@ export async function GET(request: Request) {
 }
 
 // POST /api/products - Create product (Admin only)
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null
