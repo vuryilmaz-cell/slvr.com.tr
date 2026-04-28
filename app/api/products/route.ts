@@ -116,23 +116,8 @@ export async function GET(request: Request) {
     }
 
     if (genderValues.length) {
-      const genderConditions = genderValues.map((gender) => ({
-        OR: [
-          {
-            name: {
-              contains: gender,
-            },
-          },
-          {
-            description: {
-              contains: gender,
-            },
-          },
-        ],
-      }))
-
       andFilters.push({
-        OR: genderConditions,
+        gender: { in: genderValues },
       })
     }
 
