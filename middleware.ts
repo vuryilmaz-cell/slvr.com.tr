@@ -38,7 +38,7 @@ export function middleware(request: NextRequest) {
   try {
     payload = jwt.verify(token, JWT_SECRET) as any
   } catch (err) {
-    console.log('❌ JWT Verify Error:', err.message)
+    console.log('❌ JWT Verify Error:', err instanceof Error ? err.message : err)
   }  
   console.log('🔐 Token payload:', payload)
   
