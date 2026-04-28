@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { getUserFromToken } from '@/lib/auth'
 import { writeFile, mkdir } from 'fs/promises'
 import { existsSync } from 'fs'

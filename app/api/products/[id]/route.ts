@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
@@ -26,7 +26,7 @@ const productUpdateSchema = z.object({
 
 // GET /api/products/:id - Get product by ID
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -70,7 +70,7 @@ export async function GET(
 
 // PUT /api/products/:id - Update product (Admin only)
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -166,7 +166,7 @@ export async function PUT(
 
 // DELETE /api/products/:id - Delete product (Admin only)
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {

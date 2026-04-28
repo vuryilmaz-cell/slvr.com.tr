@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserFromToken } from '@/lib/auth'
 
 // PUT /api/cart/[productId] - Update quantity
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
@@ -73,7 +73,7 @@ export async function PUT(
 
 // DELETE /api/cart/[productId] - Remove item
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {

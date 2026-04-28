@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserFromToken } from '@/lib/auth'
 import { z } from 'zod'
@@ -12,7 +12,7 @@ const categoryUpdateSchema = z.object({
 
 // PUT /api/admin/categories/:id - Update category
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -102,7 +102,7 @@ export async function PUT(
 
 // DELETE /api/admin/categories/:id - Delete category
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
