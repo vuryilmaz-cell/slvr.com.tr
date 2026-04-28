@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 // PUT /api/addresses/[id] - Update address
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('authorization')
@@ -20,9 +20,9 @@ export async function PUT(
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const addressId = parseInt(params.id)
+    const { id } = await params
+    const addressId = parseInt(id)
     
-    // Check if address belongs to user
     const existingAddress = await prisma.address.findFirst({
       where: { id: addressId, userId: payload.id }
     })
@@ -34,7 +34,6 @@ export async function PUT(
     const body = await request.json()
     const { title, firstName, lastName, phone, addressLine, city, district, postalCode, isDefault } = body
 
-    // If setting as default, unset all other defaults
     if (isDefault && !existingAddress.isDefault) {
       await prisma.address.updateMany({
         where: { userId: payload.id, isDefault: true },
@@ -64,10 +63,10 @@ export async function PUT(
   }
 }
 
-// DELETE /api/addresses/[id] - Archive address (soft delete)
+// DELETE /api/addresses/[id] - Delete address
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authHeader = request.headers.get('authorization')
@@ -82,9 +81,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const addressId = parseInt(params.id)
+    const { id } = await params
+    const addressId = parseInt(id)
     
-    // Check if address belongs to user
     const existingAddress = await prisma.address.findFirst({
       where: { id: addressId, userId: payload.id }
     })
@@ -93,7 +92,6 @@ export async function DELETE(
       return NextResponse.json({ error: 'Address not found' }, { status: 404 })
     }
 
-    // Check if address is used in any orders
     const ordersCount = await prisma.order.count({
       where: {
         OR: [
@@ -104,14 +102,11 @@ export async function DELETE(
     })
 
     if (ordersCount > 0) {
-      // Address is used in orders - can't delete
-      // Instead, we'll mark it as non-default and user won't see it in list
       return NextResponse.json({ 
         error: 'Bu adres siparişlerde kullanıldığı için silinemez' 
       }, { status: 400 })
     }
 
-    // Safe to delete - no orders using this address
     await prisma.address.delete({
       where: { id: addressId }
     })
