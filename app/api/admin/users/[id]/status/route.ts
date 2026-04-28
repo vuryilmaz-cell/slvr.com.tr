@@ -10,10 +10,9 @@ const statusSchema = z.object({
 // PUT /api/admin/users/:id/status - Update user status (Admin only)
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null
     
@@ -24,13 +23,11 @@ export async function PUT(
       )
     }
 
-    const userId = parseInt(params.id)
+    const { id } = await params
+    const userId = parseInt(id)
     const body = await request.json()
-    
-    // Validate input
     const { isActive } = statusSchema.parse(body)
 
-    // Prevent admin from deactivating themselves
     if (userId === user.id) {
       return NextResponse.json(
         { error: { message: 'Kendi hesabınızı devre dışı bırakamazsınız' } },
@@ -38,7 +35,6 @@ export async function PUT(
       )
     }
 
-    // Update user status
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: { isActive },
@@ -52,18 +48,11 @@ export async function PUT(
       }
     })
 
-    return NextResponse.json({
-      message: 'Kullanıcı durumu güncellendi',
-      user: updatedUser
-    })
+    return NextResponse.json({ message: 'Kullanıcı durumu güncellendi', user: updatedUser })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { errors: error.errors },
-        { status: 400 }
-      )
+      return NextResponse.json({ errors: error.errors }, { status: 400 })
     }
-    
     console.error('Update user status error:', error)
     return NextResponse.json(
       { error: { message: 'Durum güncellenirken hata oluştu' } },

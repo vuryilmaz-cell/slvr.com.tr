@@ -2,12 +2,11 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserFromToken } from '@/lib/auth'
 
-interface RouteParams {
-  params: { id: string }
-}
-
 // GET /api/admin/orders/[id] - Get single order
-export async function GET(request: Request, { params }: RouteParams) {
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
                   request.cookies.get('token')?.value
@@ -20,16 +19,14 @@ export async function GET(request: Request, { params }: RouteParams) {
         { status: 403 }
       )
     }
+
+    const { id } = await params
     
     const order = await prisma.order.findUnique({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       include: {
         user: {
-          select: {
-            id: true,
-            email: true,
-            fullName: true,
-          },
+          select: { id: true, email: true, fullName: true },
         },
         shippingAddress: true,
         billingAddress: true,
@@ -37,10 +34,7 @@ export async function GET(request: Request, { params }: RouteParams) {
           include: {
             product: {
               include: {
-                images: {
-                  where: { isPrimary: true },
-                  take: 1,
-                },
+                images: { where: { isPrimary: true }, take: 1 },
               },
             },
           },
@@ -65,8 +59,11 @@ export async function GET(request: Request, { params }: RouteParams) {
   }
 }
 
-// PUT /api/admin/orders/[id] - Update order status
-export async function PUT(request: Request, { params }: RouteParams) {
+// PUT /api/admin/orders/[id] - Update order
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
                   request.cookies.get('token')?.value
@@ -79,7 +76,8 @@ export async function PUT(request: Request, { params }: RouteParams) {
         { status: 403 }
       )
     }
-    
+
+    const { id } = await params
     const { status, trackingNumber, adminNote } = await request.json()
     
     const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
@@ -97,29 +95,21 @@ export async function PUT(request: Request, { params }: RouteParams) {
     if (trackingNumber !== undefined) updateData.trackingNumber = trackingNumber
     if (adminNote !== undefined) updateData.adminNote = adminNote
     
-    // Set shipping date when status changes to shipped
     if (status === 'shipped' && !updateData.shippingDate) {
       updateData.shippingDate = new Date()
     }
     
-    // Set delivery date when status changes to delivered
     if (status === 'delivered' && !updateData.deliveryDate) {
       updateData.deliveryDate = new Date()
     }
     
     const order = await prisma.order.update({
-      where: { id: parseInt(params.id) },
+      where: { id: parseInt(id) },
       data: updateData,
-      include: {
-        items: true,
-        shippingAddress: true,
-      },
+      include: { items: true, shippingAddress: true },
     })
     
-    return NextResponse.json({
-      message: 'Sipariş güncellendi',
-      order,
-    })
+    return NextResponse.json({ message: 'Sipariş güncellendi', order })
   } catch (error) {
     console.error('Update order error:', error)
     return NextResponse.json(

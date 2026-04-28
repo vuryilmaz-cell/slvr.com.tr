@@ -10,10 +10,9 @@ const statusSchema = z.object({
 // PUT /api/admin/orders/:id/status - Update order status (Admin only)
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // Check authentication
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
     const user = token ? await getUserFromToken(token) : null
     
@@ -24,30 +23,21 @@ export async function PUT(
       )
     }
 
-    const orderId = parseInt(params.id)
+    const { id } = await params
+    const orderId = parseInt(id)
     const body = await request.json()
-    
-    // Validate input
     const { status } = statusSchema.parse(body)
 
-    // Update order status
     const order = await prisma.order.update({
       where: { id: orderId },
       data: { status }
     })
 
-    return NextResponse.json({
-      message: 'Sipariş durumu güncellendi',
-      order
-    })
+    return NextResponse.json({ message: 'Sipariş durumu güncellendi', order })
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { errors: error.errors },
-        { status: 400 }
-      )
+      return NextResponse.json({ errors: error.errors }, { status: 400 })
     }
-    
     console.error('Update order status error:', error)
     return NextResponse.json(
       { error: { message: 'Durum güncellenirken hata oluştu' } },
