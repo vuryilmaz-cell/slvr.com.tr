@@ -13,7 +13,7 @@ const categoryUpdateSchema = z.object({
 // PUT /api/admin/categories/:id - Update category
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -26,7 +26,7 @@ export async function PUT(
       )
     }
 
-    const categoryId = parseInt(params.id)
+    const categoryId = parseInt((await params).id)
     const body = await request.json()
     const validatedData = categoryUpdateSchema.parse(body)
 
@@ -103,7 +103,7 @@ export async function PUT(
 // DELETE /api/admin/categories/:id - Delete category
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '')
@@ -116,7 +116,7 @@ export async function DELETE(
       )
     }
 
-    const categoryId = parseInt(params.id)
+    const categoryId = parseInt((await params).id)
 
     // Check if category exists
     const category = await prisma.category.findUnique({
