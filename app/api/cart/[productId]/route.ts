@@ -5,7 +5,7 @@ import { getUserFromToken } from '@/lib/auth'
 // PUT /api/cart/[productId] - Update quantity
 export async function PUT(
   request: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
@@ -20,7 +20,7 @@ export async function PUT(
     }
     
     const { quantity } = await request.json()
-    const productId = parseInt(params.productId)
+    const productId = parseInt((await params).productId)
     
     if (quantity < 1) {
       return NextResponse.json(
@@ -74,7 +74,7 @@ export async function PUT(
 // DELETE /api/cart/[productId] - Remove item
 export async function DELETE(
   request: Request,
-  { params }: { params: { productId: string } }
+  { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
     const token = request.headers.get('authorization')?.replace('Bearer ', '') ||
@@ -88,7 +88,7 @@ export async function DELETE(
       )
     }
     
-    const productId = parseInt(params.productId)
+    const productId = parseInt((await params).productId)
     
     await prisma.cartItem.delete({
       where: {

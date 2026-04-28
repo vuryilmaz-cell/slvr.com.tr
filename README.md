@@ -15,6 +15,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 ### Kullanıcı Özellikleri
 
 #### 🔐 Authentication
+
 - Kullanıcı kayıt sistemi
 - JWT token tabanlı giriş
 - Cookie + localStorage oturum yönetimi
@@ -22,6 +23,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - Route protection (middleware)
 
 #### 🛍️ Ürün Yönetimi
+
 - Ürün listeleme (grid görünüm)
 - Ürün detay sayfası (resim galerisi)
 - Kategori sayfaları (`/categories/[slug]`)
@@ -30,6 +32,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - İndirimli ürünler
 
 #### 🛒 Sepet Sistemi
+
 - Sepete ekleme/çıkarma
 - Miktar güncelleme
 - Navbar'da sepet badge (ürün sayısı)
@@ -37,6 +40,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - Sipariş sonrası otomatik temizleme
 
 #### 💳 Checkout & Sipariş
+
 - Adres formu (ad, soyad, telefon, adres, şehir, ilçe)
 - Ödeme yöntemi seçimi (Kredi Kartı, Havale, Kapıda Ödeme)
 - Sipariş oluşturma
@@ -44,6 +48,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - Sipariş başarı sayfası
 
 #### 📦 Siparişlerim
+
 - Sipariş listesi (tarih, tutar, durum)
 - Sipariş detay sayfası
 - Durum timeline (Onay Bekliyor → Hazırlanıyor → Kargoda → Teslim Edildi)
@@ -51,18 +56,21 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - Sipariş ürünleri (resimli)
 
 #### 👤 Profil Yönetimi
+
 - Ad soyad güncelleme
 - Telefon güncelleme
 - Şifre değiştirme (mevcut şifre kontrolü)
 - E-posta görüntüleme (değiştirilemez)
 
 #### 🏠 Adres Defteri
+
 - Adres ekleme/düzenleme/silme
 - Varsayılan adres seçimi
 - Adres etiketleri (Ev, İş, Diğer)
 - Siparişlerde kullanılan adreslerin korunması
 
 #### 🧭 Navigasyon
+
 - Dropdown kullanıcı menüsü
 - Siparişlerim linki
 - Adreslerim linki
@@ -74,6 +82,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 ## 🛠️ Teknolojiler
 
 ### Frontend
+
 - **Next.js 15** - React framework (App Router)
 - **React 19** - UI library
 - **TypeScript** - Type safety
@@ -81,6 +90,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - **Next.js Image** - Optimized images
 
 ### Backend
+
 - **Next.js API Routes** - RESTful API
 - **Prisma ORM** - Database ORM
 - **SQLite** - Database
@@ -88,6 +98,7 @@ Silvre Jewelry, 925 ayar gümüş takılar için geliştirilmiş tam özellikli 
 - **bcryptjs** - Password hashing
 
 ### State Management
+
 - **React Context API** - Global state (Auth, Cart)
 - **React Hooks** - Local state
 
@@ -166,6 +177,7 @@ silvre-nextjs/
 ## 🗄️ Database Schema
 
 ### Users
+
 ```prisma
 model User {
   id           Int       @id @default(autoincrement())
@@ -177,7 +189,7 @@ model User {
   isActive     Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
-  
+
   orders       Order[]
   cartItems    CartItem[]
   addresses    Address[]
@@ -185,6 +197,7 @@ model User {
 ```
 
 ### Products
+
 ```prisma
 model Product {
   id            Int       @id @default(autoincrement())
@@ -197,7 +210,7 @@ model Product {
   stockQuantity Int       @default(0)
   isFeatured    Boolean   @default(false)
   isActive      Boolean   @default(true)
-  
+
   category      Category
   images        ProductImage[]
   orderItems    OrderItem[]
@@ -206,6 +219,7 @@ model Product {
 ```
 
 ### Categories
+
 ```prisma
 model Category {
   id           Int       @id @default(autoincrement())
@@ -215,12 +229,13 @@ model Category {
   imageUrl     String?
   displayOrder Int       @default(0)
   isActive     Boolean   @default(true)
-  
+
   products     Product[]
 }
 ```
 
 ### Orders
+
 ```prisma
 model Order {
   id                Int       @id @default(autoincrement())
@@ -233,7 +248,7 @@ model Order {
   paymentMethod     String?
   shippingAddressId Int?
   createdAt         DateTime  @default(now())
-  
+
   user              User
   shippingAddress   Address?
   items             OrderItem[]
@@ -241,6 +256,7 @@ model Order {
 ```
 
 ### Addresses
+
 ```prisma
 model Address {
   id          Int       @id @default(autoincrement())
@@ -254,19 +270,20 @@ model Address {
   district    String
   postalCode  String?
   isDefault   Boolean   @default(false)
-  
+
   user        User
 }
 ```
 
 ### Cart Items
+
 ```prisma
 model CartItem {
   id        Int      @id @default(autoincrement())
   userId    Int
   productId Int
   quantity  Int      @default(1)
-  
+
   user      User
   product   Product
 }
@@ -277,24 +294,28 @@ model CartItem {
 ## 🔌 API Endpoints
 
 ### Authentication
+
 ```
 POST   /api/auth/register        # Kullanıcı kaydı
 POST   /api/auth/login           # Kullanıcı girişi
 ```
 
 ### Products
+
 ```
 GET    /api/products             # Tüm ürünler (filtreli)
 GET    /api/products/[slug]      # Tek ürün detayı
 ```
 
 ### Categories
+
 ```
 GET    /api/categories           # Tüm kategoriler
 GET    /api/categories/[slug]    # Tek kategori
 ```
 
 ### Cart
+
 ```
 GET    /api/cart                 # Kullanıcı sepeti
 POST   /api/cart/add             # Sepete ekleme
@@ -303,6 +324,7 @@ DELETE /api/cart/[id]            # Sepetten çıkarma
 ```
 
 ### Orders
+
 ```
 GET    /api/orders               # Kullanıcı siparişleri
 POST   /api/orders               # Yeni sipariş
@@ -310,6 +332,7 @@ GET    /api/orders/[id]          # Tek sipariş detayı
 ```
 
 ### Addresses
+
 ```
 GET    /api/addresses            # Kullanıcı adresleri
 POST   /api/addresses            # Yeni adres
@@ -318,6 +341,7 @@ DELETE /api/addresses/[id]       # Adres silme
 ```
 
 ### User Profile
+
 ```
 PUT    /api/user/profile         # Profil güncelleme
 PUT    /api/user/change-password # Şifre değiştirme
@@ -328,23 +352,27 @@ PUT    /api/user/change-password # Şifre değiştirme
 ## ⚙️ Kurulum
 
 ### Gereksinimler
+
 - Node.js 18+
 - npm veya yarn
 
 ### Adımlar
 
 1. **Projeyi klonlayın**
+
 ```bash
 git clone <repo-url>
 cd silvre-nextjs
 ```
 
 2. **Bağımlılıkları yükleyin**
+
 ```bash
 npm install
 ```
 
 3. **Environment variables oluşturun**
+
 ```bash
 # .env.local
 DATABASE_URL="file:./dev.db"
@@ -352,22 +380,26 @@ JWT_SECRET="your-secret-key-here"
 ```
 
 4. **Veritabanını oluşturun**
+
 ```bash
 npx prisma generate
 npx prisma db push
 ```
 
 5. **Seed data (opsiyonel)**
+
 ```bash
 # Kategoriler ve örnek ürünler ekleyin
 ```
 
 6. **Development server başlatın**
+
 ```bash
 npm run dev
 ```
 
 7. **Tarayıcıda açın**
+
 ```
 http://localhost:3000
 ```
@@ -381,26 +413,34 @@ http://localhost:3000
 ```typescript
 // middleware.ts
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
-  
+  const { pathname } = request.nextUrl;
+
   // Public paths
   const publicPaths = [
-    '/', '/products', '/categories', '/login', 
-    '/register', '/cart', '/checkout', '/order-success',
-    '/orders', '/profile', '/addresses'
-  ]
-  
+    "/",
+    "/products",
+    "/categories",
+    "/login",
+    "/register",
+    "/cart",
+    "/checkout",
+    "/order-success",
+    "/orders",
+    "/profile",
+    "/addresses",
+  ];
+
   // Token kontrolü
-  const token = request.cookies.get('token')?.value
-  
+  const token = request.cookies.get("token")?.value;
+
   // Admin routes
-  if (pathname.startsWith('/admin')) {
-    if (!token) return redirect('/login')
-    const payload = verifyToken(token)
-    if (payload.role !== 'admin') return redirect('/')
+  if (pathname.startsWith("/admin")) {
+    if (!token) return redirect("/login");
+    const payload = verifyToken(token);
+    if (payload.role !== "admin") return redirect("/");
   }
-  
-  return NextResponse.next()
+
+  return NextResponse.next();
 }
 ```
 
@@ -409,13 +449,17 @@ export function middleware(request: NextRequest) {
 ```typescript
 // contexts/AuthContext.tsx
 interface AuthContextType {
-  user: User | null
-  token: string | null
-  login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string, fullName: string) => Promise<void>
-  logout: () => void
-  updateUser: (updatedUser: User) => void
-  loading: boolean
+  user: User | null;
+  token: string | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    fullName: string
+  ) => Promise<void>;
+  logout: () => void;
+  updateUser: (updatedUser: User) => void;
+  loading: boolean;
 }
 ```
 
@@ -424,15 +468,15 @@ interface AuthContextType {
 ```typescript
 // contexts/CartContext.tsx
 interface CartContextType {
-  items: CartItem[]
-  loading: boolean
-  addToCart: (productId: number, quantity: number) => Promise<void>
-  updateQuantity: (productId: number, quantity: number) => Promise<void>
-  removeFromCart: (productId: number) => Promise<void>
-  clearCart: () => Promise<void>
-  cartTotal: number
-  cartCount: number
-  refreshCart: () => Promise<void>
+  items: CartItem[];
+  loading: boolean;
+  addToCart: (productId: number, quantity: number) => Promise<void>;
+  updateQuantity: (productId: number, quantity: number) => Promise<void>;
+  removeFromCart: (productId: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+  cartTotal: number;
+  cartCount: number;
+  refreshCart: () => Promise<void>;
 }
 ```
 
@@ -443,29 +487,35 @@ interface CartContextType {
 ### Yaygın Sorunlar ve Çözümleri
 
 #### 1. **Login sonrası user null**
+
 **Problem:** localStorage'da token var ama user yok  
 **Çözüm:** Sayfayı yenileyin (F5) - AuthContext useEffect user'ı yükleyecek
 
 #### 2. **Orders/Profile sayfası login'e atıyor**
+
 **Problem:** Middleware sayfayı blokluyor  
 **Çözüm:** Sayfayı middleware publicPaths'e ekleyin (sayfa kendi auth kontrolünü yapıyor)
 
 #### 3. **Adres silme hatası: "Failed to delete address"**
+
 **Problem:** Adres siparişlerde kullanılıyor (Foreign key constraint)  
 **Çözüm:** API kontrol ekler: "Bu adres siparişlerde kullanıldığı için silinemez"
 
 #### 4. **bcrypt hatası: "Illegal arguments"**
+
 **Problem:** Prisma field adı `password` yerine `passwordHash`  
 **Çözüm:** `user.passwordHash` kullanın
 
 #### 5. **Next.js 15 params hatası**
-**Problem:** `params.slug` directly accessed  
-**Çözüm:** 
+
+**Problem:** `(await params).slug` directly accessed  
+**Çözüm:**
+
 ```typescript
 // ÖNCESİ
-{ params }: { params: { slug: string } }
+{ params }: { params: Promise<{ slug: string }> }
 const category = await prisma.category.findUnique({
-  where: { slug: params.slug }
+  where: { slug: (await params).slug }
 })
 
 // SONRASI
@@ -477,10 +527,12 @@ const category = await prisma.category.findUnique({
 ```
 
 #### 6. **Sepet badge görünmüyor**
+
 **Problem:** CartContext provider eksik  
 **Çözüm:** layout.tsx'te AuthProvider içine CartProvider ekleyin
 
 #### 7. **Sipariş sonrası sepet temizlenmiyor**
+
 **Problem:** clearCart fonksiyonu eksik veya çağrılmıyor  
 **Çözüm:** Checkout'ta `await clearCart()` çağırın
 
@@ -489,12 +541,14 @@ const category = await prisma.category.findUnique({
 ## 🎨 UI/UX Özellikleri
 
 ### Responsive Design
+
 - Mobile-first approach
 - Grid layouts (1 col mobile → 4 col desktop)
 - Hamburger menü (mobil)
 - Touch-friendly butonlar
 
 ### Kullanıcı Deneyimi
+
 - Loading states
 - Success/Error mesajları
 - Form validasyonu
@@ -503,6 +557,7 @@ const category = await prisma.category.findUnique({
 - Dropdown menüler
 
 ### Görsel Öğeler
+
 - Ürün resimleri (Next.js Image optimization)
 - Kategori görselleri
 - Durum badge'leri (İndirim, Öne Çıkan)
@@ -513,6 +568,7 @@ const category = await prisma.category.findUnique({
 ## 📊 Kullanıcı Akışları
 
 ### Yeni Kullanıcı Kaydı
+
 ```
 1. /register sayfasına git
 2. Email, şifre, ad soyad gir
@@ -522,6 +578,7 @@ const category = await prisma.category.findUnique({
 ```
 
 ### Ürün Satın Alma
+
 ```
 1. Ana sayfada kategoriye tıkla → /categories/bileklikler
 2. Ürüne tıkla → /products/gumus-bileklik
@@ -536,6 +593,7 @@ const category = await prisma.category.findUnique({
 ```
 
 ### Sipariş Takibi
+
 ```
 1. Navbar dropdown → "Siparişlerim"
 2. /orders sayfası açılır
@@ -546,6 +604,7 @@ const category = await prisma.category.findUnique({
 ```
 
 ### Adres Yönetimi
+
 ```
 1. Navbar dropdown → "Adreslerim"
 2. /addresses sayfası açılır
@@ -561,12 +620,14 @@ const category = await prisma.category.findUnique({
 ## 🚀 Gelecek Özellikler (Roadmap)
 
 ### Öncelikli
+
 - [ ] Admin Panel (ürün/sipariş yönetimi)
 - [ ] Ödeme entegrasyonu (iyzico)
 - [ ] Email bildirimleri (sipariş onayı)
 - [ ] Stok yönetimi (otomatik azaltma)
 
 ### İkincil
+
 - [ ] Ürün yorumları & puanlama
 - [ ] Favoriler sistemi
 - [ ] Kupon/İndirim kodu
@@ -574,6 +635,7 @@ const category = await prisma.category.findUnique({
 - [ ] SMS bildirimleri
 
 ### Gelişmiş
+
 - [ ] Çoklu dil desteği (TR/EN)
 - [ ] Çoklu para birimi
 - [ ] Sosyal medya girişi
@@ -585,6 +647,7 @@ const category = await prisma.category.findUnique({
 ## 📈 Performans
 
 ### Optimizasyonlar
+
 - Next.js Image optimization
 - Server-side rendering (SSR)
 - Static generation (SSG) uygun sayfalarda
@@ -592,6 +655,7 @@ const category = await prisma.category.findUnique({
 - Database indexing
 
 ### Metrics
+
 - Lighthouse Score: ~90+
 - First Contentful Paint: <2s
 - Time to Interactive: <3s
@@ -601,6 +665,7 @@ const category = await prisma.category.findUnique({
 ## 🔒 Güvenlik
 
 ### Uygulamalı Güvenlik Önlemleri
+
 - JWT token authentication
 - Password hashing (bcryptjs)
 - HTTP-only cookies
@@ -616,21 +681,25 @@ const category = await prisma.category.findUnique({
 ### Önemli Kararlar
 
 1. **Next.js 15 Kullanımı**
+
    - App Router tercih edildi
    - Server/Client component ayrımı
    - Async params handling
 
 2. **SQLite Seçimi**
+
    - Development kolaylığı
    - Taşınabilirlik
    - Production'da PostgreSQL'e geçilebilir
 
 3. **Context API**
+
    - Redux yerine React Context
    - Daha basit state management
    - Küçük-orta ölçekli projeler için yeterli
 
 4. **URL Yapısı**
+
    - `/categories/[slug]` - Kategori landing
    - `/products?filters` - Gelişmiş filtreleme
    - Her iki yapı da farklı amaçlara hizmet ediyor
@@ -686,7 +755,7 @@ Tüm hakları saklıdır © 2026 Silvre Jewelry
 
 ## 🎉 Son Notlar
 
-Bu proje, modern web teknolojileri kullanılarak sıfırdan geliştirilmiş, tam özellikli bir e-ticaret platformudur. 
+Bu proje, modern web teknolojileri kullanılarak sıfırdan geliştirilmiş, tam özellikli bir e-ticaret platformudur.
 
 **Toplam Geliştirme Süreci:** ~20 saat  
 **Kod Satırı:** ~5000+  
